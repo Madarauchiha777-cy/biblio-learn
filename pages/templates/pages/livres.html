@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Books &amp; Library Catalog &bull; BiblioLearn ESMA{% endblock %}
+{% block title %}Books Archive &bull; BiblioLearn ESMA Marrakech{% endblock %}
 
 {% block content %}
 <!-- Page Header Banner with Breadcrumb -->
@@ -10,27 +10,27 @@
         <nav aria-label="breadcrumb" class="breadcrumb-theme d-flex justify-content-center mb-3">
             <ol class="breadcrumb mb-0">
                 <li class="breadcrumb-item"><a href="{% url 'pages:accueil' %}"><i class="bi bi-house me-1"></i>Home</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Books Catalog</li>
+                <li class="breadcrumb-item active" aria-current="page">Books Archive</li>
             </ol>
         </nav>
 
-        <span class="badge badge-subtle-indigo px-3 py-1 mb-3">
-            <i class="bi bi-journals me-1"></i> ESMA Marrakech University Library Collection
-        </span>
-        <h1 class="display-5 fw-bold text-white mb-2">Books &amp; Academic Catalog</h1>
-        <p class="text-muted mx-auto mb-0" style="max-width: 650px;">
-            Discover our collection of textbooks, research theses, and academic references available for circulation and reading-room consultation.
+        <div class="archival-stamp justify-content-center d-inline-block px-3 py-1 mb-2">
+            ESMA CENTRAL HOLDINGS &bull; CATALOG ACCESSION INDEX
+        </div>
+        <h1 class="display-5 font-editorial fw-bold text-white mb-2">The Academic Library Archive</h1>
+        <p class="text-muted mx-auto mb-0" style="max-width: 650px; line-height: 1.65;">
+            Explore cataloged volumes, academic treatises, and faculty-recommended course manuals currently held in the central stacks at ESMA Marrakech.
         </p>
     </div>
 </section>
 
-<!-- Advanced Search & Filter Bar -->
+<!-- Advanced Institutional Search & Filter Desk -->
 <div class="container">
     <div class="filter-card">
         <form method="get" action="{% url 'pages:livres' %}" class="row g-3 align-items-center">
             <!-- Text Search -->
             <div class="col-lg-4 col-md-6">
-                <label for="searchQuery" class="form-label small text-muted fw-semibold mb-1">Keywords / Title / Author / ISBN</label>
+                <label for="searchQuery" class="form-label small font-mono text-muted text-uppercase mb-1">Keywords / Title / Author / ISBN</label>
                 <div class="input-group">
                     <span class="input-group-text">
                         <i class="bi bi-search"></i>
@@ -40,7 +40,7 @@
                         name="q" 
                         id="searchQuery"
                         class="form-control" 
-                        placeholder="E.g. Python, Marketing, Salma..." 
+                        placeholder="E.g. Deep Learning, Architecture, Marketing..." 
                         value="{{ query }}"
                     >
                 </div>
@@ -48,9 +48,9 @@
 
             <!-- Category Filter -->
             <div class="col-lg-3 col-md-6">
-                <label for="selectCategorie" class="form-label small text-muted fw-semibold mb-1">Major / Category</label>
+                <label for="selectCategorie" class="form-label small font-mono text-muted text-uppercase mb-1">Academic Major</label>
                 <select name="categorie" id="selectCategorie" class="form-select">
-                    <option value="">All Categories</option>
+                    <option value="">All Academic Disciplines</option>
                     {% for cat in categories %}
                     <option value="{{ cat }}" {% if selected_cat == cat %}selected{% endif %}>{{ cat }}</option>
                     {% endfor %}
@@ -59,35 +59,35 @@
 
             <!-- Sort Option -->
             <div class="col-lg-2 col-md-4">
-                <label for="selectSort" class="form-label small text-muted fw-semibold mb-1">Sort by</label>
+                <label for="selectSort" class="form-label small font-mono text-muted text-uppercase mb-1">Ledger Sort</label>
                 <select name="sort" id="selectSort" class="form-select">
-                    <option value="recent" {% if sort == 'recent' %}selected{% endif %}>Most Recent</option>
-                    <option value="titre" {% if sort == 'titre' %}selected{% endif %}>Title (A-Z)</option>
-                    <option value="note" {% if sort == 'note' %}selected{% endif %}>Top Rated</option>
-                    <option value="annee" {% if sort == 'annee' %}selected{% endif %}>Publication Year</option>
-                    <option value="stock" {% if sort == 'stock' %}selected{% endif %}>Available Copies</option>
+                    <option value="recent" {% if sort == 'recent' %}selected{% endif %}>Most Recent Accessions</option>
+                    <option value="titre" {% if sort == 'titre' %}selected{% endif %}>Title (A to Z)</option>
+                    <option value="note" {% if sort == 'note' %}selected{% endif %}>Faculty Rating</option>
+                    <option value="annee" {% if sort == 'annee' %}selected{% endif %}>Publication Edition</option>
+                    <option value="stock" {% if sort == 'stock' %}selected{% endif %}>Stacks Quantity</option>
                 </select>
             </div>
 
             <!-- Availability Checkbox -->
             <div class="col-lg-2 col-md-4">
-                <label class="form-label small text-muted fw-semibold mb-1 d-none d-md-block">&nbsp;</label>
+                <label class="form-label small font-mono text-muted text-uppercase mb-1 d-none d-md-block">&nbsp;</label>
                 <div class="form-check pt-2">
                     <input class="form-check-input" type="checkbox" name="disponible" value="1" id="dispoCheck" {% if dispo_only == '1' %}checked{% endif %}>
-                    <label class="form-check-label small fw-semibold text-white" for="dispoCheck">
-                        Available only
+                    <label class="form-check-label small fw-semibold text-white font-mono" for="dispoCheck">
+                        Available in Stacks
                     </label>
                 </div>
             </div>
 
             <!-- Filter Actions -->
             <div class="col-lg-1 col-md-4 d-flex gap-2">
-                <label class="form-label small text-muted fw-semibold mb-1 d-none d-md-block">&nbsp;</label>
-                <button type="submit" class="btn btn-theme-primary w-100 py-2" title="Apply filters">
+                <label class="form-label small text-muted mb-1 d-none d-md-block">&nbsp;</label>
+                <button type="submit" class="btn btn-editorial-primary w-100 py-2" title="Apply search parameters">
                     <i class="bi bi-funnel-fill"></i>
                 </button>
                 {% if query or selected_cat or dispo_only or sort != 'recent' %}
-                <a href="{% url 'pages:livres' %}" class="btn btn-theme-outline py-2" title="Reset all filters">
+                <a href="{% url 'pages:livres' %}" class="btn btn-editorial-outline py-2" title="Reset all filters">
                     <i class="bi bi-x-lg"></i>
                 </a>
                 {% endif %}
@@ -96,9 +96,9 @@
 
         <!-- Quick Filter Pills -->
         <div class="d-flex align-items-center gap-2 flex-wrap pt-3 mt-3 border-top border-secondary border-opacity-25">
-            <span class="small text-muted fw-semibold">Quick Filter:</span>
+            <span class="small font-mono text-muted text-uppercase">Discipline Index:</span>
             <a href="{% url 'pages:livres' %}" class="filter-btn-pill {% if not selected_cat %}active{% endif %}">
-                All Titles
+                All Collections
             </a>
             {% for cat in categories %}
             <a href="{% url 'pages:livres' %}?categorie={{ cat|urlencode }}{% if query %}&q={{ query }}{% endif %}{% if dispo_only %}&disponible={{ dispo_only }}{% endif %}" class="filter-btn-pill {% if selected_cat == cat %}active{% endif %}">
@@ -109,30 +109,30 @@
     </div>
 </div>
 
-<!-- Books Catalog Section -->
+<!-- Books Archive Catalog Section -->
 <section class="py-5">
     <div class="container">
         <!-- Results Header -->
         <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center mb-4 gap-3">
             <div>
-                <h2 class="h4 fw-bold text-white mb-0">
-                    Cataloged Titles
-                    <span class="badge badge-subtle-emerald fs-6 ms-1">{{ total_count }}</span>
+                <h2 class="h4 font-editorial fw-bold text-white mb-0">
+                    Archived Volumes
+                    <span class="badge-archival badge-subtle-blue fs-6 ms-2">{{ total_count }}</span>
                 </h2>
                 {% if selected_cat or query or dispo_only %}
-                <div class="small text-muted mt-1">
-                    Active Filters: 
+                <div class="small font-mono text-muted mt-1">
+                    Applied Filters: 
                     {% if query %}<span class="text-white">"{{ query }}"</span> &bull; {% endif %}
-                    {% if selected_cat %}<span class="text-success">{{ selected_cat }}</span> &bull; {% endif %}
-                    {% if dispo_only %}<span>Available in stacks</span>{% endif %}
+                    {% if selected_cat %}<span class="text-warning">{{ selected_cat }}</span> &bull; {% endif %}
+                    {% if dispo_only %}<span>Available in stacks only</span>{% endif %}
                 </div>
                 {% endif %}
             </div>
 
             {% if request.user.is_authenticated and request.user.is_staff %}
             <div class="d-flex align-items-center gap-2">
-                <a href="{% url 'pages:dashboard_admin' %}" class="btn btn-sm btn-theme-outline">
-                    <i class="bi bi-sliders me-1 text-success"></i> Open Admin Console
+                <a href="{% url 'pages:dashboard_admin' %}" class="btn btn-sm btn-editorial-bronze">
+                    <i class="bi bi-sliders me-1"></i> Staff Inventory Console
                 </a>
             </div>
             {% endif %}
@@ -143,12 +143,14 @@
             {% for livre in livres %}
             <div class="col-md-6 col-lg-4">
                 <div class="book-card">
-                    <!-- Photo Cover Container -->
+                    <!-- Photo Cover Container with Spine Texture -->
                     <div class="book-cover-container">
                         {% if livre.cover_url %}
                         <img src="{{ livre.cover_url }}" alt="{{ livre.titre }}" class="book-cover-img" loading="lazy">
                         {% else %}
-                        <div style="background: {{ livre.couleur_couverture }}; width: 100%; height: 100%;"></div>
+                        <div style="background: {{ livre.couleur_couverture }}; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+                            <i class="bi {{ livre.icone }} text-white fs-1"></i>
+                        </div>
                         {% endif %}
 
                         <div class="book-cover-overlay">
@@ -161,21 +163,22 @@
                                 </span>
                             </div>
                             <div class="d-flex justify-content-between align-items-end">
-                                <div class="small fw-semibold text-white-50">
-                                    Edition {{ livre.annee_publication }}
+                                <div class="font-mono small text-white-50">
+                                    EDITION {{ livre.annee_publication }}
                                 </div>
-                                <span class="badge bg-dark bg-opacity-75 text-white border border-secondary border-opacity-50">
-                                    <i class="bi {{ livre.icone }} me-1"></i> Book
+                                <span class="badge bg-dark bg-opacity-75 text-white border border-secondary border-opacity-50 font-mono small">
+                                    HOLDING: {{ livre.nombre_exemplaires }}
                                 </span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Body -->
+                    <!-- Book Body -->
                     <div class="book-body">
+                        <div class="book-accession-code">CALL NO. &bull; ESMA-ARCH-{{ livre.id|stringformat:"04d" }}</div>
                         <h3 class="book-title" title="{{ livre.titre }}">{{ livre.titre }}</h3>
                         <div class="book-author">
-                            <i class="bi bi-person text-success"></i> <span>{{ livre.auteur }}</span>
+                            <i class="bi bi-pen text-warning"></i> <span>{{ livre.auteur }}</span>
                         </div>
                         <p class="book-desc">
                             {{ livre.description|default:"Core curriculum academic manual recommended for ESMA Marrakech university courses." }}
@@ -184,119 +187,111 @@
                         <div class="book-footer">
                             <div>
                                 {% if livre.disponible and livre.nombre_exemplaires > 0 %}
-                                <span class="badge badge-subtle-emerald">
-                                    <i class="bi bi-check-circle me-1"></i> {{ livre.nombre_exemplaires }} in stock
+                                <span class="badge-archival badge-subtle-sage">
+                                    <i class="bi bi-check-circle me-1"></i> {{ livre.nombre_exemplaires }} In Stacks
                                 </span>
                                 {% else %}
-                                <span class="badge badge-subtle-rose">
-                                    <i class="bi bi-x-circle me-1"></i> Checked Out
+                                <span class="badge-archival badge-subtle-rose">
+                                    <i class="bi bi-x-circle me-1"></i> On Loan
                                 </span>
                                 {% endif %}
                             </div>
 
                             <button 
                                 type="button" 
-                                class="btn btn-sm btn-theme-outline"
+                                class="btn btn-editorial-outline btn-sm"
                                 data-bs-toggle="modal" 
                                 data-bs-target="#bookModal{{ livre.id }}"
                             >
-                                <i class="bi bi-journal-text me-1"></i> Details &amp; Loan
+                                <i class="bi bi-journal-text me-1"></i> Folio Details
                             </button>
                         </div>
                     </div>
                 </div>
 
-                <!-- Complete Bootstrap 5.3.3 Modal -->
+                <!-- Complete Folio Modal -->
                 <div class="modal fade" id="bookModal{{ livre.id }}" tabindex="-1" aria-labelledby="modalLabel{{ livre.id }}" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered modal-lg">
                         <div class="modal-content">
-                            <div class="modal-body p-0">
-                                <div class="row g-0">
-                                    <!-- Cover Banner -->
-                                    <div class="col-md-5 position-relative">
-                                        {% if livre.cover_url %}
-                                        <img src="{{ livre.cover_url }}" alt="{{ livre.titre }}" class="img-fluid h-100 w-100 rounded-start-4" style="object-fit: cover; min-height: 290px;">
-                                        {% else %}
-                                        <div style="background: {{ livre.couleur_couverture }}; height: 100%; min-height: 290px;" class="d-flex align-items-center justify-content-center text-white">
-                                            <i class="bi {{ livre.icone }} display-1"></i>
+                            <div class="modal-header">
+                                <div>
+                                    <span class="badge-archival badge-subtle-bronze mb-1">{{ livre.categorie }}</span>
+                                    <h4 class="modal-title font-editorial fs-3 fw-bold text-white mb-0" id="modalLabel{{ livre.id }}">{{ livre.titre }}</h4>
+                                </div>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+
+                            <div class="modal-body p-4">
+                                <div class="row g-4">
+                                    <div class="col-md-5 text-center">
+                                        <div class="book-cover-container rounded-3 shadow-lg mx-auto" style="height: 270px; max-width: 200px;">
+                                            {% if livre.cover_url %}
+                                            <img src="{{ livre.cover_url }}" alt="{{ livre.titre }}" class="book-cover-img">
+                                            {% else %}
+                                            <div style="background: {{ livre.couleur_couverture }}; height: 100%; display: flex; align-items: center; justify-content: center;">
+                                                <i class="bi {{ livre.icone }} text-white fs-1"></i>
+                                            </div>
+                                            {% endif %}
                                         </div>
-                                        {% endif %}
-                                        <div class="position-absolute top-0 start-0 m-3">
-                                            <span class="badge badge-subtle-emerald">
-                                                {{ livre.categorie }}
+                                        <div class="mt-3">
+                                            <span class="badge-archival badge-subtle-bronze">
+                                                <i class="bi bi-star-fill text-warning me-1"></i> Academic Rating : {{ livre.note }} / 5.0
                                             </span>
                                         </div>
                                     </div>
 
-                                    <!-- Details & Loan Booking -->
-                                    <div class="col-md-7 p-4 d-flex flex-column">
-                                        <div class="d-flex justify-content-between align-items-start mb-2">
-                                            <div>
-                                                <h4 class="fw-bold text-white mb-1" id="modalLabel{{ livre.id }}">{{ livre.titre }}</h4>
-                                                <div class="text-muted small">
-                                                    By <strong class="text-light">{{ livre.auteur }}</strong> &bull; Edition {{ livre.annee_publication }}
-                                                </div>
-                                            </div>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                        </div>
-
-                                        <div class="my-3 d-flex align-items-center gap-2">
-                                            <span class="badge badge-subtle-amber">
-                                                <i class="bi bi-star-fill text-warning me-1"></i> {{ livre.note }} / 5.0
-                                            </span>
-                                            {% if livre.disponible and livre.nombre_exemplaires > 0 %}
-                                            <span class="badge badge-subtle-emerald">
-                                                <i class="bi bi-check2-circle me-1"></i> {{ livre.nombre_exemplaires }} copies available
-                                            </span>
-                                            {% else %}
-                                            <span class="badge badge-subtle-rose">
-                                                <i class="bi bi-clock-history me-1"></i> Currently unavailable
-                                            </span>
-                                            {% endif %}
-                                        </div>
-
-                                        <h6 class="text-white-50 small text-uppercase fw-bold mb-1">Book Summary:</h6>
-                                        <p class="text-muted small mb-3 flex-grow-1" style="line-height: 1.6;">
-                                            {{ livre.description|default:"This title is part of the official curriculum references recommended to students for coursework, graduation projects, and academic research." }}
-                                        </p>
-
-                                        <!-- Shelf Code & Loan Rules -->
-                                        <div class="p-3 bg-dark bg-opacity-50 rounded-3 border border-secondary border-opacity-25 mb-3">
-                                            <div class="row g-2 small">
+                                    <div class="col-md-7 d-flex flex-column">
+                                        <div class="modal-folio-strip mb-3">
+                                            <div class="row g-2">
                                                 <div class="col-6">
+                                                    <span class="text-muted">Author / Faculty:</span>
+                                                    <div class="text-white fw-bold">{{ livre.auteur }}</div>
+                                                </div>
+                                                <div class="col-6">
+                                                    <span class="text-muted">Edition:</span>
+                                                    <div class="text-white fw-bold">Published {{ livre.annee_publication }}</div>
+                                                </div>
+                                                <div class="col-12 mt-2">
                                                     <span class="text-muted">ISBN Code:</span>
-                                                    <div class="fw-semibold text-white d-flex align-items-center gap-1">
-                                                        <span>{{ livre.isbn|default:"Not specified" }}</span>
-                                                        {% if livre.isbn %}
-                                                        <button class="btn btn-link btn-sm p-0 text-success" onclick="BiblioLearn.copierISBN('{{ livre.isbn }}')" title="Copy ISBN">
+                                                    <div class="text-warning font-mono fw-bold d-flex align-items-center gap-2">
+                                                        <span>{{ livre.isbn }}</span>
+                                                        <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-1" onclick="BiblioLearn.copierISBN('{{ livre.isbn }}')" title="Copy ISBN">
                                                             <i class="bi bi-clipboard"></i>
                                                         </button>
-                                                        {% endif %}
                                                     </div>
-                                                </div>
-                                                <div class="col-6">
-                                                    <span class="text-muted">Shelf Location:</span>
-                                                    <div class="fw-semibold text-white">Section B &bull; ESMA Marrakech</div>
-                                                </div>
-                                                <div class="col-6">
-                                                    <span class="text-muted">Loan Duration:</span>
-                                                    <div class="fw-semibold text-white">14 days (Students)</div>
-                                                </div>
-                                                <div class="col-6">
-                                                    <span class="text-muted">Renewal:</span>
-                                                    <div class="fw-semibold text-white">1 time online</div>
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <!-- Modal Actions -->
-                                        <div class="d-flex justify-content-between align-items-center gap-2 pt-2 border-top border-secondary border-opacity-25">
+                                        <h6 class="text-uppercase small font-mono text-muted fw-bold mb-1">Catalog Abstract &amp; Scope:</h6>
+                                        <p class="text-muted small mb-4" style="line-height: 1.65;">
+                                            {{ livre.description|default:"Core curriculum academic manual recommended for ESMA Marrakech university courses and research." }}
+                                        </p>
+
+                                        <div class="modal-folio-strip mb-4">
+                                            <div class="row g-2 text-center">
+                                                <div class="col-4">
+                                                    <span class="text-muted small">Holding:</span>
+                                                    <div class="fw-bold text-white">{{ livre.nombre_exemplaires }} in Stacks</div>
+                                                </div>
+                                                <div class="col-4">
+                                                    <span class="text-muted small">Loan Period:</span>
+                                                    <div class="fw-bold text-white">14 Days</div>
+                                                </div>
+                                                <div class="col-4">
+                                                    <span class="text-muted small">Location:</span>
+                                                    <div class="fw-bold text-white">Stack B-14</div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="mt-auto d-flex justify-content-between align-items-center gap-2">
                                             {% if request.user.is_authenticated and request.user.is_staff %}
                                             <a href="/admin/pages/livre/{{ livre.id }}/change/" class="btn btn-outline-secondary btn-sm" target="_blank" title="Edit in Django Admin">
                                                 <i class="bi bi-pencil me-1"></i> Edit (Admin)
                                             </a>
                                             {% else %}
-                                            <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">
+                                            <button type="button" class="btn btn-editorial-outline btn-sm" data-bs-dismiss="modal">
                                                 <i class="bi bi-x me-1"></i> Close
                                             </button>
                                             {% endif %}
@@ -304,14 +299,14 @@
                                             {% if livre.disponible and livre.nombre_exemplaires > 0 %}
                                             <button 
                                                 type="button" 
-                                                class="btn btn-theme-primary btn-sm"
+                                                class="btn btn-editorial-primary btn-sm"
                                                 onclick="BiblioLearn.simulerEmprunt('{{ livre.titre|escapejs }}', 'bookModal{{ livre.id }}')"
                                             >
-                                                <i class="bi bi-check2-circle me-1"></i> Reserve at Desk
+                                                <i class="bi bi-check2-circle me-1"></i> Request at Desk
                                             </button>
                                             {% else %}
                                             <button type="button" class="btn btn-outline-warning btn-sm" disabled>
-                                                <i class="bi bi-clock me-1"></i> Checked Out
+                                                <i class="bi bi-clock me-1"></i> Currently Checked Out
                                             </button>
                                             {% endif %}
                                         </div>
@@ -325,15 +320,15 @@
             {% empty %}
             <!-- Empty State: No results -->
             <div class="col-12 text-center py-5">
-                <div class="p-5 bg-dark bg-opacity-50 rounded-4 border border-secondary border-opacity-25 mx-auto" style="max-width: 580px;">
+                <div class="p-5 bg-dark bg-opacity-50 rounded-3 border border-secondary border-opacity-25 mx-auto" style="max-width: 580px;">
                     <div class="stat-icon-wrap mx-auto mb-3" style="width: 56px; height: 56px; font-size: 1.8rem;">
                         <i class="bi bi-search text-warning"></i>
                     </div>
-                    <h3 class="fw-bold text-white mb-2">No Books Found</h3>
-                    <p class="text-muted mb-4">
-                        No titles matched your search {% if query %}for <strong>"{{ query }}"</strong>{% endif %}. Try broadening your search terms or resetting filters.
+                    <h3 class="font-editorial fw-bold text-white mb-2">No Matching Records Found</h3>
+                    <p class="text-muted mb-4 font-sans">
+                        No cataloged volumes matched your inquiry {% if query %}for <strong>"{{ query }}"</strong>{% endif %}. Broaden your search terms or reset applied filters.
                     </p>
-                    <a href="{% url 'pages:livres' %}" class="btn btn-theme-primary btn-sm">
+                    <a href="{% url 'pages:livres' %}" class="btn btn-editorial-primary btn-sm">
                         <i class="bi bi-arrow-repeat me-1"></i> Reset Filters
                     </a>
                 </div>

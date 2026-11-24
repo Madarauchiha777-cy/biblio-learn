@@ -4,20 +4,20 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="BiblioLearn — ESMA Marrakech University Library & E-Learning Portal. Book loans, academic discovery, and interactive mini-courses.">
-    <meta name="author" content="ESMA Marrakech">
-    <title>{% block title %}BiblioLearn &bull; University Library &amp; E-Learning Portal{% endblock %}</title>
+    <meta name="description" content="BiblioLearn &bull; The University Library &amp; E-Learning Archive of ESMA Marrakech. Books catalog, loan circulation, and faculty-led masterclasses.">
+    <meta name="author" content="ESMA Marrakech &bull; École Supérieure de Management &amp; d'Architecture">
+    <title>{% block title %}BiblioLearn &bull; The Signature Knowledge Archive &bull; ESMA Marrakech{% endblock %}</title>
 
-    <!-- Google Fonts: Space Grotesk & Plus Jakarta Sans -->
+    <!-- Signature Google Fonts: Cormorant Garamond (Editorial Display), Plus Jakarta Sans (UI), JetBrains Mono (Technical Archive) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <!-- Bootstrap 5.3.3 & Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 
-    <!-- BiblioLearn Custom SaaS Theme -->
+    <!-- BiblioLearn Signature Editorial Stylesheet -->
     <link rel="stylesheet" href="{% static 'css/bibliolearn.css' %}">
 
     <!-- Anti-flicker Dual Theme Initialization Script -->
@@ -36,59 +36,66 @@
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <!-- Main Navigation Bar -->
+    <!-- Main Institutional Navigation Bar -->
     <header>
         <nav class="navbar navbar-expand-lg navbar-theme sticky-top">
             <div class="container-fluid container-xl">
+                <!-- Signature Brand Presentation -->
                 <a class="navbar-brand text-nowrap" href="{% url 'pages:accueil' %}">
-                    <div class="brand-logo-icon">
-                        <i class="bi bi-book-half"></i>
+                    <div class="brand-monogram">BL</div>
+                    <div class="brand-text-wrap">
+                        <span class="brand-title">BiblioLearn</span>
+                        <span class="brand-subtitle">ESMA Marrakech &bull; Est. 2026</span>
                     </div>
-                    <span>BiblioLearn</span>
-                    <span class="brand-badge d-none d-sm-inline">ESMA</span>
                 </a>
 
                 <button class="navbar-toggler border-0 shadow-none text-white p-2" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu" aria-controls="navMenu" aria-expanded="false" aria-label="Toggle navigation">
-                    <i class="bi bi-list fs-2 text-white"></i>
+                    <i class="bi bi-list fs-2"></i>
                 </button>
 
                 <div class="collapse navbar-collapse" id="navMenu">
-                    <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-3 gap-1 align-items-lg-center">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4 gap-1 align-items-lg-center">
                         <li class="nav-item">
                             <a class="nav-link text-nowrap {% if request.resolver_match.url_name == 'accueil' %}active{% endif %}" href="{% url 'pages:accueil' %}">
                                 <i class="bi bi-house-door me-1"></i> Home
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link text-nowrap {% if request.resolver_match.url_name == 'bibliotheque_3d' %}active{% endif %}" href="{% url 'pages:bibliotheque_3d' %}">
+                                <i class="bi bi-box-fill me-1 text-warning"></i> 3D Library <span class="badge bg-warning bg-opacity-25 text-warning border border-warning border-opacity-50 font-mono py-0 px-1 ms-1" style="font-size: 0.65rem;">3D</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link text-nowrap {% if request.resolver_match.url_name == 'livres' %}active{% endif %}" href="{% url 'pages:livres' %}">
-                                <i class="bi bi-journals me-1"></i> Books &amp; Catalog
+                                <i class="bi bi-journal-bookmark me-1"></i> Books Archive
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-nowrap {% if request.resolver_match.url_name == 'modules' %}active{% endif %}" href="{% url 'pages:modules' %}">
-                                <i class="bi bi-grid-3x3-gap me-1"></i> Modules
+                                <i class="bi bi-grid-3x3-gap me-1"></i> The 4 Pillars
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-nowrap {% if request.resolver_match.url_name == 'mini_cours' %}active{% endif %}" href="{% url 'pages:mini_cours' %}">
-                                <i class="bi bi-mortarboard me-1"></i> Mini-Courses
+                                <i class="bi bi-mortarboard me-1"></i> Masterclasses
                             </a>
                         </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle text-nowrap" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="bi bi-info-circle me-1"></i> Guides
+                                <i class="bi bi-info-circle me-1"></i> Institutional Guides
                             </a>
                             <ul class="dropdown-menu border-secondary border-opacity-25 shadow-lg">
-                                <li><a class="dropdown-item" href="{% url 'pages:modules' %}#emprunts"><i class="bi bi-arrow-left-right me-2 text-warning"></i>Borrowing Guide</a></li>
-                                <li><a class="dropdown-item" href="{% url 'pages:modules' %}#permissions"><i class="bi bi-shield-check me-2 text-success"></i>Roles &amp; Quotas</a></li>
+                                <li><a class="dropdown-item" href="{% url 'pages:bibliotheque_3d' %}"><i class="bi bi-box-fill me-2 text-warning"></i>3D Stacks &bull; Meet BIBI</a></li>
+                                <li><a class="dropdown-item" href="{% url 'pages:modules' %}#emprunts"><i class="bi bi-arrow-left-right me-2 text-warning"></i>Circulation &amp; Due Dates</a></li>
+                                <li><a class="dropdown-item" href="{% url 'pages:modules' %}#permissions"><i class="bi bi-shield-check me-2 text-success"></i>Role Governance Matrix</a></li>
                                 <li><hr class="dropdown-divider border-secondary border-opacity-25"></li>
-                                <li><a class="dropdown-item" href="{% url 'pages:accueil' %}#faq"><i class="bi bi-question-circle me-2 text-info"></i>Campus FAQ</a></li>
+                                <li><a class="dropdown-item" href="{% url 'pages:accueil' %}#faq"><i class="bi bi-question-circle me-2 text-info"></i>Campus Research FAQ</a></li>
                             </ul>
                         </li>
                     </ul>
 
                     <div class="navbar-actions d-flex align-items-center gap-2 flex-nowrap ms-lg-3">
-                        <!-- Dual-Mode Theme Switcher -->
+                        <!-- Dual-Mode Theme Switcher (Obsidian / Warm Paper) -->
                         <div class="dropdown">
                             <button class="btn btn-theme-switcher" id="bd-theme" type="button" aria-expanded="false" data-bs-toggle="dropdown" aria-label="Toggle theme">
                                 <i class="bi bi-moon-stars-fill" id="themeActiveIcon"></i>
@@ -96,33 +103,34 @@
                             <ul class="dropdown-menu dropdown-menu-end border-secondary border-opacity-25 shadow-lg py-2" aria-labelledby="bd-theme">
                                 <li>
                                     <button type="button" class="dropdown-item d-flex align-items-center justify-content-between" data-bs-theme-value="light">
-                                        <span class="d-flex align-items-center"><i class="bi bi-sun-fill me-2 text-warning"></i> Light Mode</span>
+                                        <span class="d-flex align-items-center"><i class="bi bi-sun-fill me-2 text-warning"></i> Warm Paper (Light)</span>
                                         <i class="bi bi-check2 theme-check-icon text-primary ms-3 d-none"></i>
                                     </button>
                                 </li>
                                 <li>
                                     <button type="button" class="dropdown-item d-flex align-items-center justify-content-between" data-bs-theme-value="dark">
-                                        <span class="d-flex align-items-center"><i class="bi bi-moon-stars-fill me-2 text-primary"></i> Dark Mode</span>
+                                        <span class="d-flex align-items-center"><i class="bi bi-moon-stars-fill me-2 text-primary"></i> Obsidian Ink (Dark)</span>
                                         <i class="bi bi-check2 theme-check-icon text-primary ms-3 d-none"></i>
                                     </button>
                                 </li>
                                 <li><hr class="dropdown-divider border-secondary border-opacity-25"></li>
                                 <li>
                                     <button type="button" class="dropdown-item d-flex align-items-center justify-content-between" data-bs-theme-value="auto">
-                                        <span class="d-flex align-items-center"><i class="bi bi-circle-half me-2 text-info"></i> Auto (System)</span>
+                                        <span class="d-flex align-items-center"><i class="bi bi-circle-half me-2 text-info"></i> Auto (System OS)</span>
                                         <i class="bi bi-check2 theme-check-icon text-primary ms-3 d-none"></i>
                                     </button>
                                 </li>
                             </ul>
                         </div>
 
+                        <!-- Action Button -->
                         {% if request.user.is_authenticated and request.user.is_staff %}
-                        <a href="{% url 'pages:dashboard_admin' %}" class="btn btn-theme-primary btn-sm text-nowrap">
-                            <i class="bi bi-shield-lock-fill me-1"></i> Admin Console
+                        <a href="{% url 'pages:dashboard_admin' %}" class="btn btn-editorial-bronze btn-sm text-nowrap">
+                            <i class="bi bi-shield-lock-fill me-1"></i> Staff Console
                         </a>
                         {% else %}
-                        <a href="{% url 'pages:livres' %}" class="btn btn-theme-primary btn-sm text-nowrap">
-                            <i class="bi bi-search me-1"></i> Search Books
+                        <a href="{% url 'pages:livres' %}" class="btn btn-editorial-primary btn-sm text-nowrap">
+                            <i class="bi bi-search me-1"></i> Research Catalog <span class="font-mono text-white-50 ms-1 opacity-75">/</span>
                         </a>
                         {% endif %}
                     </div>
@@ -131,93 +139,101 @@
         </nav>
     </header>
 
-    <!-- Main Content -->
+    <!-- Main Content Injection -->
     <main class="flex-grow-1">
         {% block content %}{% endblock %}
     </main>
 
-    <!-- University Footer -->
+    <!-- Signature Editorial Colophon & Footer -->
     <footer class="footer-theme">
         <div class="container">
             <div class="row g-4 pb-4 border-bottom border-secondary border-opacity-25">
+                <!-- Colophon Brand & Mission -->
                 <div class="col-lg-4">
-                    <div class="footer-brand d-flex align-items-center gap-2 mb-3">
-                        <div class="brand-logo-icon" style="width: 32px; height: 32px; font-size: 1.05rem;">
-                            <i class="bi bi-book-half"></i>
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <div class="brand-monogram" style="width: 32px; height: 32px; font-size: 1.1rem;">BL</div>
+                        <div>
+                            <span class="brand-title" style="font-size: 1.25rem;">BiblioLearn</span>
                         </div>
-                        <span>BiblioLearn</span>
-                        <span class="brand-badge">ESMA</span>
                     </div>
-                    <p class="small text-muted mb-3" style="max-width: 380px; line-height: 1.6;">
-                        University portal for library catalog management, physical book loans, and online self-paced video modules for ESMA Marrakech students and faculty.
+                    <div class="archival-stamp mb-2">
+                        ESMA MARRAKECH &bull; ARCHIVE REF: BL-MAR-2026
+                    </div>
+                    <p class="small text-muted mb-3" style="max-width: 380px; line-height: 1.65;">
+                        The official university library archive and academic e-learning portal of École Supérieure de Management &amp; d'Architecture. Dedicated to intellectual curiosity, scholarship, and digital preservation.
                     </p>
-                    <div class="small text-muted d-flex align-items-center gap-2">
-                        <i class="bi bi-geo-alt-fill text-danger"></i>
-                        <span>ESMA Campus &bull; Marrakech, Morocco</span>
+                    <div class="small font-mono text-muted d-flex align-items-center gap-2">
+                        <i class="bi bi-geo-alt-fill text-warning"></i>
+                        <span>Campus Marrakech &bull; 31.6295&deg; N, 7.9811&deg; W</span>
                     </div>
                 </div>
 
+                <!-- Academic Archive Navigation -->
                 <div class="col-6 col-md-3 col-lg-2">
-                    <h6 class="text-white fw-bold mb-3 small text-uppercase letter-spacing-1">Navigation</h6>
+                    <h6 class="text-white fw-bold mb-3 small text-uppercase font-mono letter-spacing-1">Collections</h6>
                     <ul class="list-unstyled d-flex flex-column gap-2 mb-0">
-                        <li><a href="{% url 'pages:accueil' %}" class="footer-link">Home</a></li>
-                        <li><a href="{% url 'pages:livres' %}" class="footer-link">Books &amp; Catalog</a></li>
-                        <li><a href="{% url 'pages:modules' %}" class="footer-link">The 4 Modules</a></li>
-                        <li><a href="{% url 'pages:mini_cours' %}" class="footer-link">E-Learning Courses</a></li>
+                        <li><a href="{% url 'pages:accueil' %}" class="footer-link">Home Archive</a></li>
+                        <li><a href="{% url 'pages:bibliotheque_3d' %}" class="footer-link text-warning"><i class="bi bi-box-fill me-1"></i>3D Virtual Library</a></li>
+                        <li><a href="{% url 'pages:livres' %}" class="footer-link">Books &amp; Monographs</a></li>
+                        <li><a href="{% url 'pages:modules' %}" class="footer-link">The 4 Pillars</a></li>
+                        <li><a href="{% url 'pages:mini_cours' %}" class="footer-link">Video Masterclasses</a></li>
                     </ul>
                 </div>
 
+                <!-- Institutional Governance & Policies -->
                 <div class="col-6 col-md-3 col-lg-3">
-                    <h6 class="text-white fw-bold mb-3 small text-uppercase letter-spacing-1">Services &amp; Policy</h6>
+                    <h6 class="text-white fw-bold mb-3 small text-uppercase font-mono letter-spacing-1">Governance</h6>
                     <ul class="list-unstyled d-flex flex-column gap-2 mb-0">
-                        <li><a href="{% url 'pages:livres' %}" class="footer-link">Catalog &amp; Stock Availability</a></li>
-                        <li><a href="{% url 'pages:modules' %}#emprunts" class="footer-link">Loan Rules &amp; Extensions</a></li>
-                        <li><a href="{% url 'pages:mini_cours' %}" class="footer-link">Interactive Masterclasses</a></li>
+                        <li><a href="{% url 'pages:livres' %}" class="footer-link">Stacks Inventory &amp; Holding</a></li>
+                        <li><a href="{% url 'pages:modules' %}#emprunts" class="footer-link">14-Day Circulation Ledger</a></li>
+                        <li><a href="{% url 'pages:modules' %}#permissions" class="footer-link">Access Quotas &amp; RBAC</a></li>
                         {% if request.user.is_authenticated and request.user.is_staff %}
-                        <li><a href="{% url 'pages:dashboard_admin' %}" class="footer-link text-success"><i class="bi bi-shield-lock me-1"></i>Staff Admin Console</a></li>
+                        <li><a href="{% url 'pages:dashboard_admin' %}" class="footer-link text-warning"><i class="bi bi-shield-lock me-1"></i>Staff Command Console</a></li>
                         {% else %}
-                        <li><a href="{% url 'pages:modules' %}#comptes" class="footer-link">Library Access &amp; Membership</a></li>
+                        <li><a href="{% url 'pages:modules' %}#comptes" class="footer-link">Student &amp; Faculty Access</a></li>
                         {% endif %}
                     </ul>
                 </div>
 
+                <!-- Archival Hours & Digital Availability -->
                 <div class="col-md-6 col-lg-3">
-                    <h6 class="text-white fw-bold mb-3 small text-uppercase letter-spacing-1">Library Hours</h6>
-                    <p class="small text-muted mb-2">ESMA Central Library:</p>
+                    <h6 class="text-white fw-bold mb-3 small text-uppercase font-mono letter-spacing-1">Reading Room Hours</h6>
+                    <p class="small text-muted mb-2 font-mono">ESMA CENTRAL REPOSITORY:</p>
                     <div class="small text-white fw-semibold mb-1">
-                        <i class="bi bi-clock me-1 text-primary"></i> Mon &ndash; Fri : 08:30 AM &ndash; 06:30 PM
+                        <i class="bi bi-clock me-1 text-warning"></i> Monday &ndash; Friday : 08:30 &ndash; 18:30
                     </div>
                     <div class="small text-white fw-semibold mb-3">
-                        <i class="bi bi-clock me-1 text-primary"></i> Saturday : 09:00 AM &ndash; 01:00 PM
+                        <i class="bi bi-clock me-1 text-warning"></i> Saturday : 09:00 &ndash; 13:00
                     </div>
-                    <span class="badge badge-subtle-emerald px-2 py-1">
-                        <i class="bi bi-wifi me-1"></i> Web Platform Available 24/7
-                    </span>
+                    <div class="badge-archival badge-subtle-sage">
+                        <i class="bi bi-check-circle-fill me-1"></i> Digital Archive Online 24/7
+                    </div>
                 </div>
             </div>
 
-            <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center pt-3 small text-muted">
+            <!-- Colophon Baseline -->
+            <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center pt-3 small text-muted font-mono">
                 <div>&copy; 2026 BiblioLearn &bull; ESMA Marrakech. All rights reserved.</div>
                 <div class="mt-2 mt-sm-0">
                     <span class="badge bg-dark border border-secondary border-opacity-50 text-muted">
-                        Django 5.2.19 &bull; Bootstrap 5.3.3 &bull; Python 3.13
+                        Django 5.2.19 &bull; Bootstrap 5.3.3 &bull; Cormorant &bull; Python 3.13
                     </span>
                 </div>
             </div>
         </div>
     </footer>
 
-    <!-- Global Toast Notification -->
+    <!-- Archival Toast Notification -->
     <div class="toast-container-custom">
         <div id="liveToast" class="toast toast-custom align-items-center" role="alert" aria-live="assertive" aria-atomic="true">
             <div class="toast-header">
                 <i id="toastIcon" class="bi bi-info-circle-fill text-info me-2 fs-5"></i>
-                <strong id="toastTitle" class="me-auto text-white">Notification</strong>
-                <small class="text-muted">Just now</small>
+                <strong id="toastTitle" class="me-auto text-white">Archival Slip</strong>
+                <small class="text-muted font-mono">Just now</small>
                 <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
             </div>
             <div id="toastBody" class="toast-body small text-white-50">
-                Action completed successfully.
+                Action recorded in campus registry.
             </div>
         </div>
     </div>
@@ -225,7 +241,7 @@
     <!-- Bootstrap 5.3.3 JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- BiblioLearn Application Script -->
+    <!-- BiblioLearn Application & Theme Engine Script -->
     <script src="{% static 'js/bibliolearn.js' %}"></script>
 
     {% block extra_js %}{% endblock %}

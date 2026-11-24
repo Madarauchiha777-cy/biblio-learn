@@ -1,0 +1,214 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}3D Virtual Library Archive &bull; BIBI Digital Librarian &bull; ESMA Marrakech{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Prevent vertical scrolling on 3D viewport */
+    body {
+        overflow-x: hidden;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="library-3d-wrapper">
+    <!-- WebGL Canvas Mount Container -->
+    <div id="webgl-container"></div>
+
+    <!-- Loading Shroud Screen -->
+    <div id="scene-loader" class="scene-loader">
+        <div class="scene-loader-spinner"></div>
+        <div class="brand-monogram mb-3" style="width: 44px; height: 44px; font-size: 1.4rem;">BL</div>
+        <h4 class="font-editorial text-white mb-2">Entering ESMA Central Virtual Stacks</h4>
+        <p class="small text-muted font-mono mb-0 letter-spacing-1">INITIALIZING ARCHITECTURAL ENVIRONMENT &bull; BIBI ONLINE</p>
+    </div>
+
+    <!-- WebGL Unsupported Fallback Notification -->
+    <div id="webgl-fallback" class="d-none position-absolute top-50 start-50 translate-middle text-center p-4 bg-dark border border-warning rounded">
+        <i class="bi bi-exclamation-triangle-fill text-warning fs-1 mb-3"></i>
+        <h4 class="font-editorial text-white">WebGL Hardware Acceleration Required</h4>
+        <p class="text-muted small">Your current browser environment does not support WebGL 3D rendering.</p>
+        <a href="{% url 'pages:livres' %}" class="btn btn-editorial-primary btn-sm">
+            <i class="bi bi-journal-bookmark me-1"></i> Open Standard 2D Catalog
+        </a>
+    </div>
+
+    <!-- 1. FLOATING TOP HUD CONTROL BAR -->
+    <div class="hud-topbar">
+        <div class="hud-glass-panel">
+            <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-primary bg-opacity-25 text-primary border border-primary border-opacity-50 font-mono small py-1 px-2">
+                    <i class="bi bi-box-fill me-1"></i> LIVE 3D
+                </span>
+                <span class="small font-mono text-white text-uppercase d-none d-md-inline letter-spacing-1">
+                    ESMA ARCHIVE STACKS &bull; MARRAKECH
+                </span>
+            </div>
+            <div class="vr bg-secondary opacity-50 d-none d-md-block" style="height: 20px;"></div>
+            <div class="d-none d-md-flex align-items-center gap-3 small font-mono text-muted">
+                <span>TOTAL: <strong class="text-white" id="hud-total-books">{{ total_livres }}</strong></span>
+                <span>AVAILABLE: <strong class="text-success" id="hud-avail-books">{{ total_disponibles }}</strong></span>
+            </div>
+        </div>
+
+        <div class="d-flex align-items-center gap-2">
+            <!-- 3D Real-Time Catalog Filter -->
+            <div class="hud-glass-panel">
+                <i class="bi bi-search text-warning small"></i>
+                <input type="text" id="hud-search-input" class="hud-search-input" placeholder="Search 3D shelves..." autocomplete="off">
+            </div>
+
+            <!-- Procedural Web Audio Ambient Soundscape Toggle -->
+            <button id="btn-toggle-audio" class="btn btn-editorial-outline btn-sm font-mono py-2 text-nowrap" type="button">
+                <i class="bi bi-volume-mute-fill me-1"></i> Ambience Muted
+            </button>
+
+            <!-- Quick Exit to 2D Stacks -->
+            <a href="{% url 'pages:livres' %}" class="btn btn-editorial-outline btn-sm font-mono py-2 text-nowrap" title="Switch to Standard Grid View">
+                <i class="bi bi-grid-fill me-1"></i> 2D Index
+            </a>
+        </div>
+    </div>
+
+    <!-- 2. CATEGORY QUICK-SWITCH PILL RAIL -->
+    <div class="hud-category-rail" id="hud-category-pills">
+        {% for cat in categories %}
+        <button class="btn-hud-pill" type="button">{{ cat }}</button>
+        {% endfor %}
+    </div>
+
+    <!-- 3. BIBI DIGITAL LIBRARIAN SPEECH CAPSULE -->
+    <div id="bibi-speech-capsule" class="bibi-speech-capsule">
+        <div class="bibi-avatar-badge">
+            <i class="bi bi-person-badge-fill"></i>
+        </div>
+        <div class="flex-grow-1">
+            <div class="bibi-speech-meta">
+                <span>BIBI &bull; DIGITAL LIBRARIAN</span>
+                <span class="opacity-75">&bull; HEAD OF STACKS</span>
+            </div>
+            <p id="bibi-speech-text" class="bibi-speech-text">
+                "Welcome to the central reading hall. Click on any monograph to request retrieval, or use the camera rails to explore the stacks."
+            </p>
+        </div>
+    </div>
+
+    <!-- 4. CAMERA VIEWPOINT RAIL (Instant Spatial Bookmarks) -->
+    <div class="camera-viewpoint-rail">
+        <button class="btn-viewpoint active" data-viewpoint="overview">
+            <i class="bi bi-compass"></i> Grand Hall
+        </button>
+        <button class="btn-viewpoint" data-viewpoint="desk">
+            <i class="bi bi-person-standing"></i> Meet BIBI
+        </button>
+        <button class="btn-viewpoint" data-viewpoint="cs">
+            <i class="bi bi-code-slash"></i> CS Stacks
+        </button>
+        <button class="btn-viewpoint" data-viewpoint="ai">
+            <i class="bi bi-cpu"></i> AI Alcove
+        </button>
+        <button class="btn-viewpoint" data-viewpoint="design">
+            <i class="bi bi-palette"></i> Design Wing
+        </button>
+        <button class="btn-viewpoint" data-viewpoint="mgmt">
+            <i class="bi bi-briefcase"></i> Management
+        </button>
+    </div>
+
+    <!-- 5. FLOATING 3D HOVER CALLOUT (Appears when hovering on a book) -->
+    <div id="book-hover-callout" class="d-none">
+        <div class="callout-cat">CATEGORY</div>
+        <div class="callout-title">Book Title</div>
+        <div class="callout-author">Author</div>
+        <div class="callout-status text-success">AVAILABLE IN STACKS</div>
+    </div>
+
+    <!-- 6. ARCHIVAL SLIDE-OUT BOOK FOLIO DRAWER -->
+    <aside id="book-folio-drawer" class="book-folio-drawer" aria-label="Book Archive Folio">
+        <div class="folio-drawer-header">
+            <div class="d-flex align-items-center gap-2">
+                <div class="brand-monogram" style="width: 32px; height: 32px; font-size: 1.05rem;">BL</div>
+                <div>
+                    <div class="font-editorial text-white fw-bold" style="font-size: 1.15rem; line-height: 1.1;">Archival Folio</div>
+                    <div class="small font-mono text-bronze" style="font-size: 0.68rem; letter-spacing: 0.08em;">ESMA ACCESSION PROTOCOL</div>
+                </div>
+            </div>
+            <button type="button" id="btn-close-folio" class="btn-close" aria-label="Close drawer"></button>
+        </div>
+
+        <div class="folio-drawer-body">
+            <!-- Book Cover Showcase -->
+            <div class="folio-cover-wrap">
+                <img id="folio-cover" class="folio-cover-img" src="" alt="Monograph Cover">
+            </div>
+
+            <!-- Monograph Headline & Attribution -->
+            <div class="mb-3">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <span id="folio-category" class="badge-archival badge-subtle-blue">Category</span>
+                    <span id="folio-availability" class="badge-archival badge-subtle-sage">Available</span>
+                </div>
+                <h4 id="folio-title" class="font-editorial text-white mb-1" style="font-size: 1.45rem; line-height: 1.25;">Title</h4>
+                <div id="folio-author" class="text-muted small fw-medium">Author</div>
+            </div>
+
+            <!-- Archival Metadata Grid -->
+            <div class="folio-meta-grid">
+                <div class="folio-meta-item">
+                    <div class="meta-label">Accession ISBN</div>
+                    <div id="folio-isbn" class="meta-value font-mono">ISBN</div>
+                </div>
+                <div class="folio-meta-item">
+                    <div class="meta-label">Publication Year</div>
+                    <div id="folio-year" class="meta-value font-mono">2026</div>
+                </div>
+                <div class="folio-meta-item">
+                    <div class="meta-label">Physical Stacks</div>
+                    <div id="folio-copies" class="meta-value font-mono">3 Copies</div>
+                </div>
+                <div class="folio-meta-item">
+                    <div class="meta-label">Faculty Rating</div>
+                    <div id="folio-rating" class="meta-value font-mono text-warning">4.8 / 5.0</div>
+                </div>
+            </div>
+
+            <!-- Synopsis -->
+            <div class="mb-4">
+                <h6 class="font-mono text-uppercase small text-muted letter-spacing-1 mb-2">Archival Abstract</h6>
+                <p id="folio-desc" class="small text-muted" style="line-height: 1.65;">
+                    Description
+                </p>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="folio-actions">
+                <button type="button" id="btn-folio-borrow" class="btn btn-editorial-bronze w-100">
+                    <i class="bi bi-bookmark-check-fill me-1"></i> Request 14-Day Loan
+                </button>
+                <button type="button" id="btn-folio-return" class="btn btn-editorial-outline w-100">
+                    <i class="bi bi-arrow-return-left me-1"></i> Return Book to Shelf
+                </button>
+            </div>
+        </div>
+    </aside>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Three.js (r128) Core Library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<!-- Three.js OrbitControls -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+<!-- Tween.js for Smooth Interpolations -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/18.6.4/tween.umd.js"></script>
+
+<!-- BIBI Digital Librarian Kinematics Engine -->
+<script src="{% static 'js/bibi_character.js' %}"></script>
+
+<!-- 3D University Library Main Experience Engine -->
+<script src="{% static 'js/three_library.js' %}"></script>
+{% endblock %}

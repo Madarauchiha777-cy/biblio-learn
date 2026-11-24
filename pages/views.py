@@ -3,6 +3,8 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib import messages
+from django.http import JsonResponse
+from django.views.decorators.http import require_http_methods
 from .models import Livre, Categorie, MiniCours, CategorieCours, NiveauCours
 
 
@@ -424,7 +426,7 @@ def ajouter_cours_admin(request):
     if request.method == "POST":
         titre = request.POST.get("titre", "").strip()
         formateur = request.POST.get("formateur", "").strip()
-        categorie = request.POST.get("categorie", CategorieCours.DEV.value)
+        categorie = request.POST.get("categorie", CategorieCours.DEVELOPPEMENT.value)
         niveau = request.POST.get("niveau", NiveauCours.DEBUTANT.value)
         duree = request.POST.get("duree_minutes", "60")
         lecons = request.POST.get("nombre_lecons", "5")
@@ -461,4 +463,108 @@ def ajouter_cours_admin(request):
             messages.error(request, "Course title and instructor are required.")
 
     return redirect("/dashboard-admin/?tab=cours")
+
+
+# ==============================================================================
+# 3D IMMERSIVE UNIVERSITY LIBRARY & BIBI DIGITAL LIBRARIAN ENDPOINTS
+# ==============================================================================
+
+def bibliotheque_3d(request):
+    """
+    Renders the flagship 3D University Library experience for ESMA Marrakech.
+    Features the interactive Three.js architectural hall and BIBI the digital librarian.
+    """
+    livres = Livre.objects.all().order_by("-date_ajout")
+    categories = [cat.value for cat in Categorie]
+    total_livres = livres.count()
+    total_disponibles = livres.filter(disponible=True).count()
+
+    contexte = {
+        "nom_projet": "BiblioLearn",
+        "categories": categories,
+        "total_livres": total_livres,
+        "total_disponibles": total_disponibles,
+        "livres": livres,
+    }
+    return render(request, "pages/bibliotheque_3d.html", contexte)
+
+
+def api_library_3d(request):
+    """
+    REST JSON endpoint providing real-time catalog records to the Three.js scene.
+    Each book is populated onto its corresponding physical academic shelf.
+    """
+    livres = Livre.objects.all().order_by("categorie", "titre")
+
+    books_data = []
+    for livre in livres:
+        books_data.append({
+            "id": livre.id,
+            "titre": livre.titre,
+            "auteur": livre.auteur,
+            "categorie": livre.categorie,
+            "isbn": livre.isbn or f"ESMA-ARCH-{livre.id:04d}",
+            "annee": livre.annee_publication,
+            "description": livre.description or "Official academic monograph cataloged in ESMA Marrakech central holdings.",
+            "exemplaires": livre.nombre_exemplaires,
+            "disponible": livre.disponible,
+            "note": float(livre.note) if livre.note else 4.8,
+            "cover_url": livre.cover_url or "",
+            "couleur": livre.couleur_couverture or "#315C9B",
+            "icone": livre.icone or "bi-book",
+        })
+
+    categories_list = [cat.value for cat in Categorie]
+
+    return JsonResponse({
+        "success": True,
+        "total": len(books_data),
+        "available_count": sum(1 for b in books_data if b["disponible"]),
+        "categories": categories_list,
+        "books": books_data,
+    })
+
+
+@require_http_methods(["POST"])
+def api_emprunter_livre(request, livre_id):
+    """
+    Registers an archival loan request for a book directly from the 3D interaction.
+    """
+    livre = get_object_or_404(Livre, id=livre_id)
+    if not livre.disponible:
+        return JsonResponse({
+            "success": False,
+            "message": f"'{livre.titre}' is currently on loan to another campus member.",
+            "disponible": False,
+        }, status=400)
+
+    livre.disponible = False
+    livre.save()
+
+    return JsonResponse({
+        "success": True,
+        "message": f"Loan confirmed for '{livre.titre}'. Registered for 14-day archival circulation under ESMA policy.",
+        "disponible": False,
+        "livre_id": livre.id,
+        "titre": livre.titre,
+    })
+
+
+@require_http_methods(["POST"])
+def api_retourner_livre(request, livre_id):
+    """
+    Checks a book back into the central stacks, allowing BIBI to place it back on the shelf.
+    """
+    livre = get_object_or_404(Livre, id=livre_id)
+    livre.disponible = True
+    livre.save()
+
+    return JsonResponse({
+        "success": True,
+        "message": f"'{livre.titre}' was successfully returned and restocked in stacks.",
+        "disponible": True,
+        "livre_id": livre.id,
+        "titre": livre.titre,
+    })
+
 

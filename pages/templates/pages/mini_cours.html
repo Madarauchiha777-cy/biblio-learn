@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Mini-Courses &amp; Self-Learning &bull; BiblioLearn ESMA{% endblock %}
+{% block title %}Faculty Masterclasses &bull; BiblioLearn ESMA Marrakech{% endblock %}
 
 {% block content %}
 <!-- Page Header Banner with Breadcrumb -->
@@ -10,16 +10,16 @@
         <nav aria-label="breadcrumb" class="breadcrumb-theme d-flex justify-content-center mb-3">
             <ol class="breadcrumb mb-0">
                 <li class="breadcrumb-item"><a href="{% url 'pages:accueil' %}"><i class="bi bi-house me-1"></i>Home</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Mini-Courses</li>
+                <li class="breadcrumb-item active" aria-current="page">Faculty Masterclasses</li>
             </ol>
         </nav>
 
-        <span class="badge badge-subtle-cyan px-3 py-1 mb-3">
-            <i class="bi bi-mortarboard-fill me-1"></i> ESMA Marrakech University Courses
-        </span>
-        <h1 class="display-5 fw-bold text-white mb-2">Mini-Courses &amp; Self-Paced Learning</h1>
-        <p class="text-muted mx-auto mb-0" style="max-width: 680px;">
-            Self-paced interactive video modules to enhance your academic skillset: thesis methodology, modern Python &amp; Django development, UI/UX with Figma, and applied artificial intelligence.
+        <div class="archival-stamp justify-content-center d-inline-block px-3 py-1 mb-2">
+            ESMA FACULTY ATELIER &bull; VIDEO CAPSULES &amp; SYLLABI
+        </div>
+        <h1 class="display-5 font-editorial fw-bold text-white mb-2">Academic Masterclasses &amp; E-Learning</h1>
+        <p class="text-muted mx-auto mb-0" style="max-width: 680px; line-height: 1.65;">
+            Self-paced video modules produced by ESMA Marrakech professors to empower core competency development: software engineering, thesis methodology, design architecture, and applied AI.
         </p>
     </div>
 </section>
@@ -30,7 +30,7 @@
         <form method="get" action="{% url 'pages:mini_cours' %}" class="row g-3 align-items-center">
             <!-- Text Search -->
             <div class="col-lg-4 col-md-6">
-                <label for="searchCourse" class="form-label small text-muted fw-semibold mb-1">Keywords / Title / Instructor</label>
+                <label for="searchCourse" class="form-label small font-mono text-muted text-uppercase mb-1">Keywords / Title / Instructor</label>
                 <div class="input-group">
                     <span class="input-group-text">
                         <i class="bi bi-search"></i>
@@ -48,9 +48,9 @@
 
             <!-- Learning Domain -->
             <div class="col-lg-3 col-md-6">
-                <label for="selectCourseCat" class="form-label small text-muted fw-semibold mb-1">Learning Field</label>
+                <label for="selectCourseCat" class="form-label small font-mono text-muted text-uppercase mb-1">Domain</label>
                 <select name="categorie" id="selectCourseCat" class="form-select">
-                    <option value="">All Learning Fields</option>
+                    <option value="">All Academic Disciplines</option>
                     {% for cat in categories %}
                     <option value="{{ cat }}" {% if selected_cat == cat %}selected{% endif %}>{{ cat }}</option>
                     {% endfor %}
@@ -59,7 +59,7 @@
 
             <!-- Level -->
             <div class="col-lg-2 col-md-4">
-                <label for="selectCourseLevel" class="form-label small text-muted fw-semibold mb-1">Level</label>
+                <label for="selectCourseLevel" class="form-label small font-mono text-muted text-uppercase mb-1">Level</label>
                 <select name="niveau" id="selectCourseLevel" class="form-select">
                     <option value="">All Levels</option>
                     {% for niv in niveaux %}
@@ -70,9 +70,9 @@
 
             <!-- Sort -->
             <div class="col-lg-2 col-md-4">
-                <label for="selectCourseSort" class="form-label small text-muted fw-semibold mb-1">Sort by</label>
+                <label for="selectCourseSort" class="form-label small font-mono text-muted text-uppercase mb-1">Sort by</label>
                 <select name="sort" id="selectCourseSort" class="form-select">
-                    <option value="populaire" {% if sort == 'populaire' %}selected{% endif %}>Popular First</option>
+                    <option value="populaire" {% if sort == 'populaire' %}selected{% endif %}>Featured First</option>
                     <option value="recent" {% if sort == 'recent' %}selected{% endif %}>Most Recent</option>
                     <option value="titre" {% if sort == 'titre' %}selected{% endif %}>Title (A-Z)</option>
                     <option value="lecons" {% if sort == 'lecons' %}selected{% endif %}>Lesson Count</option>
@@ -81,12 +81,12 @@
 
             <!-- Action Buttons -->
             <div class="col-lg-1 col-md-4 d-flex gap-2">
-                <label class="form-label small text-muted fw-semibold mb-1 d-none d-md-block">&nbsp;</label>
-                <button type="submit" class="btn btn-theme-secondary w-100 py-2" title="Apply filters">
+                <label class="form-label small text-muted mb-1 d-none d-md-block">&nbsp;</label>
+                <button type="submit" class="btn btn-editorial-bronze w-100 py-2" title="Apply filters">
                     <i class="bi bi-funnel-fill"></i>
                 </button>
                 {% if query or selected_cat or selected_niveau or sort != 'populaire' %}
-                <a href="{% url 'pages:mini_cours' %}" class="btn btn-theme-outline py-2" title="Reset all filters">
+                <a href="{% url 'pages:mini_cours' %}" class="btn btn-editorial-outline py-2" title="Reset all filters">
                     <i class="bi bi-x-lg"></i>
                 </a>
                 {% endif %}
@@ -95,9 +95,9 @@
 
         <!-- Quick Filter Pills -->
         <div class="d-flex align-items-center gap-2 flex-wrap pt-3 mt-3 border-top border-secondary border-opacity-25">
-            <span class="small text-muted fw-semibold">Topics:</span>
+            <span class="small font-mono text-muted text-uppercase">Discipline:</span>
             <a href="{% url 'pages:mini_cours' %}" class="filter-btn-pill {% if not selected_cat %}active{% endif %}">
-                All Courses
+                All Masterclasses
             </a>
             {% for cat in categories %}
             <a href="{% url 'pages:mini_cours' %}?categorie={{ cat|urlencode }}{% if query %}&q={{ query }}{% endif %}{% if selected_niveau %}&niveau={{ selected_niveau }}{% endif %}" class="filter-btn-pill {% if selected_cat == cat %}active{% endif %}">
@@ -114,15 +114,15 @@
         <!-- Results Header -->
         <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center mb-4 gap-3">
             <div>
-                <h2 class="h4 fw-bold text-white mb-0">
-                    Available Courses
-                    <span class="badge badge-subtle-teal fs-6 ms-1">{{ total_cours }}</span>
+                <h2 class="h4 font-editorial fw-bold text-white mb-0">
+                    Curriculum Masterclasses
+                    <span class="badge-archival badge-subtle-bronze fs-6 ms-2">{{ total_cours }}</span>
                 </h2>
                 {% if selected_cat or selected_niveau or query %}
-                <div class="small text-muted mt-1">
-                    Filters: 
+                <div class="small font-mono text-muted mt-1">
+                    Applied Filters: 
                     {% if query %}<span class="text-white">"{{ query }}"</span> &bull; {% endif %}
-                    {% if selected_cat %}<span class="text-success">{{ selected_cat }}</span> &bull; {% endif %}
+                    {% if selected_cat %}<span class="text-warning">{{ selected_cat }}</span> &bull; {% endif %}
                     {% if selected_niveau %}<span>Level: {{ selected_niveau }}</span>{% endif %}
                 </div>
                 {% endif %}
@@ -130,8 +130,8 @@
 
             {% if request.user.is_authenticated and request.user.is_staff %}
             <div class="d-flex align-items-center gap-2">
-                <a href="{% url 'pages:dashboard_admin' %}?tab=cours" class="btn btn-sm btn-theme-outline">
-                    <i class="bi bi-sliders me-1 text-info"></i> Manage Courses (Admin)
+                <a href="{% url 'pages:dashboard_admin' %}?tab=cours" class="btn btn-sm btn-editorial-bronze">
+                    <i class="bi bi-sliders me-1"></i> Staff Course Console
                 </a>
             </div>
             {% endif %}
@@ -147,163 +147,151 @@
                         {% if c.cover_url %}
                         <img src="{{ c.cover_url }}" alt="{{ c.titre }}" class="course-cover-img" loading="lazy">
                         {% else %}
-                        <div style="background: {{ c.couleur }}; width: 100%; height: 100%;"></div>
+                        <div style="background: linear-gradient(135deg, #162032 0%, #111827 100%); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+                            <i class="bi bi-mortarboard text-warning fs-1"></i>
+                        </div>
                         {% endif %}
 
                         <div class="course-cover-overlay">
                             <div class="d-flex justify-content-between align-items-center">
-                                <span class="book-cover-badge">{{ c.categorie }}</span>
-                                {% if c.populaire %}
-                                <span class="badge bg-warning text-dark fw-bold">
-                                    <i class="bi bi-fire me-1"></i> Popular
-                                </span>
-                                {% endif %}
+                                <span class="badge-archival badge-subtle-blue">{{ c.categorie }}</span>
+                                <span class="badge-archival badge-subtle-bronze">{{ c.niveau }}</span>
                             </div>
 
                             <div class="d-flex justify-content-between align-items-end">
-                                {% if c.niveau == 'Débutant' or c.niveau == 'Beginner' %}
-                                <span class="badge badge-subtle-emerald">Level: Beginner</span>
-                                {% elif c.niveau == 'Intermédiaire' or c.niveau == 'Intermediate' %}
-                                <span class="badge badge-subtle-teal">Level: Intermediate</span>
-                                {% else %}
-                                <span class="badge badge-subtle-emerald">Level: Advanced</span>
-                                {% endif %}
-
-                                <span class="badge bg-dark bg-opacity-75 text-white border border-secondary border-opacity-50">
-                                    <i class="bi bi-play-circle-fill me-1 text-success"></i> Course
+                                <span class="font-mono small text-white-50">
+                                    <i class="bi bi-clock me-1"></i> {{ c.duree_minutes }} MIN
+                                </span>
+                                <span class="badge bg-dark bg-opacity-75 text-white border border-secondary border-opacity-50 font-mono small">
+                                    {{ c.nombre_lecons }} CAPSULES
                                 </span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Body -->
+                    <!-- Course Body -->
                     <div class="course-body">
-                        <h3 class="course-title" title="{{ c.titre }}">{{ c.titre }}</h3>
+                        <div class="book-accession-code">MASTERCLASS FOLIO &bull; ATELIER-{{ c.id|stringformat:"03d" }}</div>
+                        <h3 class="course-title">{{ c.titre }}</h3>
                         <div class="course-teacher">
-                            <i class="bi bi-person-video3 text-info"></i> <span>{{ c.formateur }}</span>
+                            <i class="bi bi-person-badge text-warning"></i> Faculty Lead : <strong>{{ c.formateur }}</strong>
                         </div>
                         <p class="course-desc">
-                            {{ c.description }}
+                            {{ c.description|default:"Interactive video module designed to accelerate academic competencies and practical engineering mastery." }}
                         </p>
 
-                        <!-- Progress Bar Indicator -->
-                        <div class="mb-3">
-                            <div class="d-flex justify-content-between small text-muted mb-1">
-                                <span>Estimated Progress</span>
-                                <span>Open Access</span>
-                            </div>
-                            <div class="progress" style="height: 6px; background-color: #1a3d36;" role="progressbar" aria-label="Progress" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
-                                <div class="progress-bar" style="width: 100%; background: var(--bl-gradient-primary);"></div>
-                            </div>
-                        </div>
-
-                        <!-- Course Meta -->
-                        <div class="course-meta">
-                            <span><i class="bi bi-clock text-warning me-1"></i> {{ c.duree }}</span>
-                            <span><i class="bi bi-layers text-success me-1"></i> {{ c.nombre_lecons }} lessons</span>
-                            <span class="text-success"><i class="bi bi-patch-check me-1"></i> ESMA</span>
-                        </div>
-
-                        <!-- Footer -->
-                        <div class="course-footer">
-                            <span class="badge bg-dark border border-secondary border-opacity-50 text-muted">
-                                E-Learning
-                            </span>
-
+                        <div class="course-footer pt-3 border-top border-secondary border-opacity-25">
                             <button 
                                 type="button" 
-                                class="btn btn-sm btn-theme-secondary"
+                                class="btn btn-editorial-outline btn-sm"
                                 data-bs-toggle="modal" 
                                 data-bs-target="#courseModal{{ c.id }}"
                             >
-                                <i class="bi bi-play-fill me-1"></i> Start Course
+                                <i class="bi bi-list-check me-1"></i> Syllabus
+                            </button>
+
+                            <button 
+                                type="button" 
+                                class="btn btn-editorial-bronze btn-sm"
+                                onclick="BiblioLearn.demarrerCours('{{ c.titre|escapejs }}', 'courseModal{{ c.id }}')"
+                            >
+                                <i class="bi bi-play-fill me-1"></i> Launch Video
                             </button>
                         </div>
                     </div>
                 </div>
 
-                <!-- Course Modal -->
-                <div class="modal fade" id="courseModal{{ c.id }}" tabindex="-1" aria-labelledby="courseLabel{{ c.id }}" aria-hidden="true">
+                <!-- Complete Course Modal -->
+                <div class="modal fade" id="courseModal{{ c.id }}" tabindex="-1" aria-labelledby="modalCourseLabel{{ c.id }}" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered modal-lg">
                         <div class="modal-content">
-                            <div class="modal-body p-0">
-                                <div class="row g-0">
-                                    <div class="col-md-5 position-relative">
-                                        {% if c.cover_url %}
-                                        <img src="{{ c.cover_url }}" alt="{{ c.titre }}" class="img-fluid h-100 w-100 rounded-start-4" style="object-fit: cover; min-height: 290px;">
-                                        {% else %}
-                                        <div style="background: {{ c.couleur }}; height: 100%; min-height: 290px;" class="d-flex align-items-center justify-content-center text-white">
-                                            <i class="bi {{ c.icone }} display-1"></i>
+                            <div class="modal-header">
+                                <div>
+                                    <span class="badge-archival badge-subtle-bronze mb-1">{{ c.categorie }} &bull; {{ c.niveau }}</span>
+                                    <h4 class="modal-title font-editorial fs-3 fw-bold text-white mb-0" id="modalCourseLabel{{ c.id }}">{{ c.titre }}</h4>
+                                </div>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+
+                            <div class="modal-body p-4">
+                                <div class="row g-4">
+                                    <div class="col-md-5">
+                                        <div class="course-cover-container rounded-3 shadow-lg mx-auto" style="height: 240px;">
+                                            {% if c.cover_url %}
+                                            <img src="{{ c.cover_url }}" alt="{{ c.titre }}" class="course-cover-img">
+                                            {% else %}
+                                            <div style="background: linear-gradient(135deg, #162032 0%, #111827 100%); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+                                                <i class="bi bi-mortarboard text-warning fs-1"></i>
+                                            </div>
+                                            {% endif %}
                                         </div>
-                                        {% endif %}
-                                        <div class="position-absolute top-0 start-0 m-3">
-                                            <span class="badge badge-subtle-teal">
-                                                {{ c.categorie }}
-                                            </span>
+
+                                        <div class="modal-folio-strip mt-3 text-center">
+                                            <div class="fw-bold text-white mb-1"><i class="bi bi-patch-check-fill text-warning me-1"></i> Academic Accreditation:</div>
+                                            <div class="small text-muted">Course syllabus verified by ESMA Marrakech department of academic affairs.</div>
                                         </div>
                                     </div>
 
-                                    <div class="col-md-7 p-4 d-flex flex-column">
-                                        <div class="d-flex justify-content-between align-items-start mb-2">
-                                            <div>
-                                                <h4 class="fw-bold text-white mb-1" id="courseLabel{{ c.id }}">{{ c.titre }}</h4>
-                                                <div class="text-muted small">
-                                                    Instructor: <strong class="text-light">{{ c.formateur }}</strong> &bull; Estimated Duration: {{ c.duree }}
+                                    <div class="col-md-7 d-flex flex-column">
+                                        <div class="modal-folio-strip mb-3">
+                                            <div class="row g-2">
+                                                <div class="col-6">
+                                                    <span class="text-muted">Instructor:</span>
+                                                    <div class="text-white fw-bold">{{ c.formateur }}</div>
+                                                </div>
+                                                <div class="col-6">
+                                                    <span class="text-muted">Difficulty:</span>
+                                                    <div class="text-white fw-bold">{{ c.niveau }}</div>
+                                                </div>
+                                                <div class="col-6 mt-2">
+                                                    <span class="text-muted">Duration:</span>
+                                                    <div class="text-warning font-mono fw-bold">{{ c.duree_minutes }} Minutes</div>
+                                                </div>
+                                                <div class="col-6 mt-2">
+                                                    <span class="text-muted">Curriculum:</span>
+                                                    <div class="text-white font-mono fw-bold">{{ c.nombre_lecons }} Video Capsules</div>
                                                 </div>
                                             </div>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                         </div>
 
-                                        <div class="my-3 d-flex gap-2 flex-wrap">
-                                            <span class="badge badge-subtle-emerald">
-                                                Level: {{ c.niveau }}
-                                            </span>
-                                            <span class="badge badge-subtle-teal">
-                                                {{ c.nombre_lecons }} Video Lessons
-                                            </span>
-                                            <span class="badge badge-subtle-amber">
-                                                Free Campus Access
-                                            </span>
-                                        </div>
+                                        <h6 class="text-uppercase small font-mono text-muted fw-bold mb-1">Course Abstract &amp; Learning Goals:</h6>
+                                        <p class="text-muted small mb-4" style="line-height: 1.65;">
+                                            {{ c.description|default:"Interactive video capsule designed to guide students through theoretical fundamentals and applied exercises with industry-standard toolchains." }}
+                                        </p>
 
-                                        <h6 class="text-white-50 small text-uppercase fw-bold mb-1">Learning Objectives:</h6>
-                                        <p class="text-muted small mb-3" style="line-height: 1.6;">{{ c.description }}</p>
-
-                                        <!-- Course Syllabus -->
-                                        <h6 class="text-white-50 small text-uppercase fw-bold mb-2">Syllabus &amp; Curriculum Breakdown:</h6>
-                                        <div class="list-group list-group-flush border border-secondary border-opacity-25 rounded-3 mb-4 small">
-                                            <div class="list-group-item bg-dark bg-opacity-50 text-white d-flex justify-content-between align-items-center py-2 border-secondary border-opacity-25">
-                                                <span><i class="bi bi-play-circle-fill text-success me-2"></i> 1. Introduction &amp; Theoretical Foundations</span>
-                                                <span class="text-muted">15 min</span>
+                                        <h6 class="text-uppercase small font-mono text-muted fw-bold mb-2">Curriculum Breakdown:</h6>
+                                        <div class="d-flex flex-column gap-2 mb-4">
+                                            <div class="modal-folio-strip d-flex align-items-center justify-content-between py-2">
+                                                <span><i class="bi bi-play-circle me-2 text-warning"></i> 01. Theoretical Foundations &amp; Literature Review</span>
+                                                <span class="font-mono text-muted small">15 min</span>
                                             </div>
-                                            <div class="list-group-item bg-dark bg-opacity-50 text-white d-flex justify-content-between align-items-center py-2 border-secondary border-opacity-25">
-                                                <span><i class="bi bi-laptop text-info me-2"></i> 2. Guided Practical Walkthrough &amp; Demonstration</span>
-                                                <span class="text-muted">30 min</span>
+                                            <div class="modal-folio-strip d-flex align-items-center justify-content-between py-2">
+                                                <span><i class="bi bi-play-circle me-2 text-warning"></i> 02. Architectural Analysis &amp; Practical Implementation</span>
+                                                <span class="font-mono text-muted small">20 min</span>
                                             </div>
-                                            <div class="list-group-item bg-dark bg-opacity-50 text-white d-flex justify-content-between align-items-center py-2 border-secondary border-opacity-25">
-                                                <span><i class="bi bi-check2-square text-success me-2"></i> 3. Summary Review &amp; Knowledge Validation Quiz</span>
-                                                <span class="text-muted">15 min</span>
+                                            <div class="modal-folio-strip d-flex align-items-center justify-content-between py-2">
+                                                <span><i class="bi bi-play-circle me-2 text-warning"></i> 03. Applied Case Study &amp; Examination Checkpoint</span>
+                                                <span class="font-mono text-muted small">15 min</span>
                                             </div>
                                         </div>
 
-                                        <!-- Modal Actions -->
-                                        <div class="d-flex justify-content-between align-items-center gap-2 pt-2 border-top border-secondary border-opacity-25 mt-auto">
+                                        <div class="mt-auto d-flex justify-content-between align-items-center gap-2">
                                             {% if request.user.is_authenticated and request.user.is_staff %}
                                             <a href="/admin/pages/minicours/{{ c.id }}/change/" class="btn btn-outline-secondary btn-sm" target="_blank" title="Edit in Django Admin">
                                                 <i class="bi bi-pencil me-1"></i> Admin
                                             </a>
                                             {% else %}
-                                            <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">
+                                            <button type="button" class="btn btn-editorial-outline btn-sm" data-bs-dismiss="modal">
                                                 <i class="bi bi-x me-1"></i> Close
                                             </button>
                                             {% endif %}
 
                                             <button 
                                                 type="button" 
-                                                class="btn btn-theme-secondary btn-sm"
+                                                class="btn btn-editorial-bronze btn-sm"
                                                 onclick="BiblioLearn.demarrerCours('{{ c.titre|escapejs }}', 'courseModal{{ c.id }}')"
                                             >
-                                                <i class="bi bi-play-circle-fill me-1"></i> Launch Video
+                                                <i class="bi bi-play-circle-fill me-1"></i> Launch Atelier
                                             </button>
                                         </div>
                                     </div>
@@ -316,35 +304,31 @@
             {% empty %}
             <!-- Empty State -->
             <div class="col-12 text-center py-5">
-                <div class="p-5 bg-dark bg-opacity-50 rounded-4 border border-secondary border-opacity-25 mx-auto" style="max-width: 580px;">
+                <div class="p-5 bg-dark bg-opacity-50 rounded-3 border border-secondary border-opacity-25 mx-auto" style="max-width: 580px;">
                     <div class="stat-icon-wrap mx-auto mb-3" style="width: 56px; height: 56px; font-size: 1.8rem;">
-                        <i class="bi bi-mortarboard text-warning"></i>
+                        <i class="bi bi-play-circle text-warning"></i>
                     </div>
-                    <h3 class="fw-bold text-white mb-2">No Mini-Courses Found</h3>
-                    <p class="text-muted mb-4">
-                        No courses matched your search criteria {% if query %}for <strong>"{{ query }}"</strong>{% endif %}. Try selecting another field or resetting filters.
+                    <h3 class="font-editorial fw-bold text-white mb-2">No Courses Found</h3>
+                    <p class="text-muted mb-4 font-sans">
+                        No faculty masterclasses matched your filter parameters. Try resetting your search or exploring all domains.
                     </p>
-                    <a href="{% url 'pages:mini_cours' %}" class="btn btn-theme-secondary btn-sm">
-                        <i class="bi bi-arrow-repeat me-1"></i> View All Courses
+                    <a href="{% url 'pages:mini_cours' %}" class="btn btn-editorial-primary btn-sm">
+                        <i class="bi bi-arrow-repeat me-1"></i> Reset Filters
                     </a>
                 </div>
             </div>
             {% endfor %}
         </div>
 
-        <!-- Django Pagination -->
+        <!-- Pagination -->
         {% if page_obj.paginator.num_pages > 1 %}
         <nav aria-label="Course pagination" class="mt-5 d-flex justify-content-center">
             <ul class="pagination pagination-theme">
                 {% if page_obj.has_previous %}
                 <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if selected_cat %}&categorie={{ selected_cat }}{% endif %}{% if selected_niveau %}&niveau={{ selected_niveau }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}" aria-label="Previous">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if selected_cat %}&categorie={{ selected_cat }}{% endif %}{% if selected_niveau %}&niveau={{ selected_niveau }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}">
                         <i class="bi bi-chevron-left"></i> Previous
                     </a>
-                </li>
-                {% else %}
-                <li class="page-item disabled">
-                    <span class="page-link"><i class="bi bi-chevron-left"></i> Previous</span>
                 </li>
                 {% endif %}
 
@@ -362,13 +346,9 @@
 
                 {% if page_obj.has_next %}
                 <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if selected_cat %}&categorie={{ selected_cat }}{% endif %}{% if selected_niveau %}&niveau={{ selected_niveau }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}" aria-label="Next">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if selected_cat %}&categorie={{ selected_cat }}{% endif %}{% if selected_niveau %}&niveau={{ selected_niveau }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}">
                         Next <i class="bi bi-chevron-right"></i>
                     </a>
-                </li>
-                {% else %}
-                <li class="page-item disabled">
-                    <span class="page-link">Next <i class="bi bi-chevron-right"></i></span>
                 </li>
                 {% endif %}
             </ul>

@@ -10,6 +10,13 @@ urlpatterns = [
     path("modules/", views.liste_modules, name="modules"),
     path("mini-cours/", views.liste_mini_cours, name="mini_cours"),
 
+    # Immersive 3D University Library & BIBI Experience
+    path("virtual-library/", views.bibliotheque_3d, name="bibliotheque_3d"),
+    path("bibliotheque-3d/", views.bibliotheque_3d, name="bibliotheque_3d_alias"),
+    path("api/library-3d/", views.api_library_3d, name="api_library_3d"),
+    path("api/livres/<int:livre_id>/emprunter/", views.api_emprunter_livre, name="api_emprunter_livre"),
+    path("api/livres/<int:livre_id>/retourner/", views.api_retourner_livre, name="api_retourner_livre"),
+
     # Dedicated Private Admin Dashboard
     path("dashboard-admin/", views.dashboard_admin, name="dashboard_admin"),
     path("dashboard-admin/livres/ajouter/", views.ajouter_livre_admin, name="ajouter_livre_admin"),

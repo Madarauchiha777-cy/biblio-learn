@@ -68,9 +68,10 @@ const BiblioLearn = {
                     const chosen = toggle.getAttribute('data-bs-theme-value');
                     this.setStoredTheme(chosen);
                     this.setTheme(chosen);
+                    const label = chosen === 'light' ? 'Warm Paper (Light)' : (chosen === 'dark' ? 'Obsidian Ink (Dark)' : 'Auto System');
                     BiblioLearn.toast(
                         'Theme Mode Updated',
-                        `Interface switched to <strong>${chosen.toUpperCase()}</strong> mode.`,
+                        `Visual atmosphere set to <strong>${label}</strong>.`,
                         'info'
                     );
                 });
