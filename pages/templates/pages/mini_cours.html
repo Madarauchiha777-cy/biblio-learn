@@ -1,0 +1,379 @@
+{% extends "base.html" %}
+
+{% block title %}Mini-Courses &amp; Self-Learning &bull; BiblioLearn ESMA{% endblock %}
+
+{% block content %}
+<!-- Page Header Banner with Breadcrumb -->
+<section class="page-header-banner">
+    <div class="container text-center">
+        <!-- Bootstrap 5.3 Breadcrumb -->
+        <nav aria-label="breadcrumb" class="breadcrumb-theme d-flex justify-content-center mb-3">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{% url 'pages:accueil' %}"><i class="bi bi-house me-1"></i>Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Mini-Courses</li>
+            </ol>
+        </nav>
+
+        <span class="badge badge-subtle-cyan px-3 py-1 mb-3">
+            <i class="bi bi-mortarboard-fill me-1"></i> ESMA Marrakech University Courses
+        </span>
+        <h1 class="display-5 fw-bold text-white mb-2">Mini-Courses &amp; Self-Paced Learning</h1>
+        <p class="text-muted mx-auto mb-0" style="max-width: 680px;">
+            Self-paced interactive video modules to enhance your academic skillset: thesis methodology, modern Python &amp; Django development, UI/UX with Figma, and applied artificial intelligence.
+        </p>
+    </div>
+</section>
+
+<!-- Search & Filter Card -->
+<div class="container">
+    <div class="filter-card">
+        <form method="get" action="{% url 'pages:mini_cours' %}" class="row g-3 align-items-center">
+            <!-- Text Search -->
+            <div class="col-lg-4 col-md-6">
+                <label for="searchCourse" class="form-label small text-muted fw-semibold mb-1">Keywords / Title / Instructor</label>
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="bi bi-search"></i>
+                    </span>
+                    <input 
+                        type="text" 
+                        name="q" 
+                        id="searchCourse"
+                        class="form-control" 
+                        placeholder="E.g. Python, Thesis, Figma, AI..." 
+                        value="{{ query }}"
+                    >
+                </div>
+            </div>
+
+            <!-- Learning Domain -->
+            <div class="col-lg-3 col-md-6">
+                <label for="selectCourseCat" class="form-label small text-muted fw-semibold mb-1">Learning Field</label>
+                <select name="categorie" id="selectCourseCat" class="form-select">
+                    <option value="">All Learning Fields</option>
+                    {% for cat in categories %}
+                    <option value="{{ cat }}" {% if selected_cat == cat %}selected{% endif %}>{{ cat }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Level -->
+            <div class="col-lg-2 col-md-4">
+                <label for="selectCourseLevel" class="form-label small text-muted fw-semibold mb-1">Level</label>
+                <select name="niveau" id="selectCourseLevel" class="form-select">
+                    <option value="">All Levels</option>
+                    {% for niv in niveaux %}
+                    <option value="{{ niv }}" {% if selected_niveau == niv %}selected{% endif %}>{{ niv }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Sort -->
+            <div class="col-lg-2 col-md-4">
+                <label for="selectCourseSort" class="form-label small text-muted fw-semibold mb-1">Sort by</label>
+                <select name="sort" id="selectCourseSort" class="form-select">
+                    <option value="populaire" {% if sort == 'populaire' %}selected{% endif %}>Popular First</option>
+                    <option value="recent" {% if sort == 'recent' %}selected{% endif %}>Most Recent</option>
+                    <option value="titre" {% if sort == 'titre' %}selected{% endif %}>Title (A-Z)</option>
+                    <option value="lecons" {% if sort == 'lecons' %}selected{% endif %}>Lesson Count</option>
+                </select>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="col-lg-1 col-md-4 d-flex gap-2">
+                <label class="form-label small text-muted fw-semibold mb-1 d-none d-md-block">&nbsp;</label>
+                <button type="submit" class="btn btn-theme-secondary w-100 py-2" title="Apply filters">
+                    <i class="bi bi-funnel-fill"></i>
+                </button>
+                {% if query or selected_cat or selected_niveau or sort != 'populaire' %}
+                <a href="{% url 'pages:mini_cours' %}" class="btn btn-theme-outline py-2" title="Reset all filters">
+                    <i class="bi bi-x-lg"></i>
+                </a>
+                {% endif %}
+            </div>
+        </form>
+
+        <!-- Quick Filter Pills -->
+        <div class="d-flex align-items-center gap-2 flex-wrap pt-3 mt-3 border-top border-secondary border-opacity-25">
+            <span class="small text-muted fw-semibold">Topics:</span>
+            <a href="{% url 'pages:mini_cours' %}" class="filter-btn-pill {% if not selected_cat %}active{% endif %}">
+                All Courses
+            </a>
+            {% for cat in categories %}
+            <a href="{% url 'pages:mini_cours' %}?categorie={{ cat|urlencode }}{% if query %}&q={{ query }}{% endif %}{% if selected_niveau %}&niveau={{ selected_niveau }}{% endif %}" class="filter-btn-pill {% if selected_cat == cat %}active{% endif %}">
+                {{ cat }}
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Courses Grid Section -->
+<section class="py-5">
+    <div class="container">
+        <!-- Results Header -->
+        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center mb-4 gap-3">
+            <div>
+                <h2 class="h4 fw-bold text-white mb-0">
+                    Available Courses
+                    <span class="badge badge-subtle-teal fs-6 ms-1">{{ total_cours }}</span>
+                </h2>
+                {% if selected_cat or selected_niveau or query %}
+                <div class="small text-muted mt-1">
+                    Filters: 
+                    {% if query %}<span class="text-white">"{{ query }}"</span> &bull; {% endif %}
+                    {% if selected_cat %}<span class="text-success">{{ selected_cat }}</span> &bull; {% endif %}
+                    {% if selected_niveau %}<span>Level: {{ selected_niveau }}</span>{% endif %}
+                </div>
+                {% endif %}
+            </div>
+
+            {% if request.user.is_authenticated and request.user.is_staff %}
+            <div class="d-flex align-items-center gap-2">
+                <a href="{% url 'pages:dashboard_admin' %}?tab=cours" class="btn btn-sm btn-theme-outline">
+                    <i class="bi bi-sliders me-1 text-info"></i> Manage Courses (Admin)
+                </a>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Courses Cards Grid -->
+        <div class="row g-4">
+            {% for c in cours %}
+            <div class="col-md-6 col-lg-4">
+                <div class="course-card">
+                    <!-- Photo Cover Container -->
+                    <div class="course-cover-container">
+                        {% if c.cover_url %}
+                        <img src="{{ c.cover_url }}" alt="{{ c.titre }}" class="course-cover-img" loading="lazy">
+                        {% else %}
+                        <div style="background: {{ c.couleur }}; width: 100%; height: 100%;"></div>
+                        {% endif %}
+
+                        <div class="course-cover-overlay">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="book-cover-badge">{{ c.categorie }}</span>
+                                {% if c.populaire %}
+                                <span class="badge bg-warning text-dark fw-bold">
+                                    <i class="bi bi-fire me-1"></i> Popular
+                                </span>
+                                {% endif %}
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-end">
+                                {% if c.niveau == 'Débutant' or c.niveau == 'Beginner' %}
+                                <span class="badge badge-subtle-emerald">Level: Beginner</span>
+                                {% elif c.niveau == 'Intermédiaire' or c.niveau == 'Intermediate' %}
+                                <span class="badge badge-subtle-teal">Level: Intermediate</span>
+                                {% else %}
+                                <span class="badge badge-subtle-emerald">Level: Advanced</span>
+                                {% endif %}
+
+                                <span class="badge bg-dark bg-opacity-75 text-white border border-secondary border-opacity-50">
+                                    <i class="bi bi-play-circle-fill me-1 text-success"></i> Course
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Body -->
+                    <div class="course-body">
+                        <h3 class="course-title" title="{{ c.titre }}">{{ c.titre }}</h3>
+                        <div class="course-teacher">
+                            <i class="bi bi-person-video3 text-info"></i> <span>{{ c.formateur }}</span>
+                        </div>
+                        <p class="course-desc">
+                            {{ c.description }}
+                        </p>
+
+                        <!-- Progress Bar Indicator -->
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between small text-muted mb-1">
+                                <span>Estimated Progress</span>
+                                <span>Open Access</span>
+                            </div>
+                            <div class="progress" style="height: 6px; background-color: #1a3d36;" role="progressbar" aria-label="Progress" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+                                <div class="progress-bar" style="width: 100%; background: var(--bl-gradient-primary);"></div>
+                            </div>
+                        </div>
+
+                        <!-- Course Meta -->
+                        <div class="course-meta">
+                            <span><i class="bi bi-clock text-warning me-1"></i> {{ c.duree }}</span>
+                            <span><i class="bi bi-layers text-success me-1"></i> {{ c.nombre_lecons }} lessons</span>
+                            <span class="text-success"><i class="bi bi-patch-check me-1"></i> ESMA</span>
+                        </div>
+
+                        <!-- Footer -->
+                        <div class="course-footer">
+                            <span class="badge bg-dark border border-secondary border-opacity-50 text-muted">
+                                E-Learning
+                            </span>
+
+                            <button 
+                                type="button" 
+                                class="btn btn-sm btn-theme-secondary"
+                                data-bs-toggle="modal" 
+                                data-bs-target="#courseModal{{ c.id }}"
+                            >
+                                <i class="bi bi-play-fill me-1"></i> Start Course
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Course Modal -->
+                <div class="modal fade" id="courseModal{{ c.id }}" tabindex="-1" aria-labelledby="courseLabel{{ c.id }}" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-body p-0">
+                                <div class="row g-0">
+                                    <div class="col-md-5 position-relative">
+                                        {% if c.cover_url %}
+                                        <img src="{{ c.cover_url }}" alt="{{ c.titre }}" class="img-fluid h-100 w-100 rounded-start-4" style="object-fit: cover; min-height: 290px;">
+                                        {% else %}
+                                        <div style="background: {{ c.couleur }}; height: 100%; min-height: 290px;" class="d-flex align-items-center justify-content-center text-white">
+                                            <i class="bi {{ c.icone }} display-1"></i>
+                                        </div>
+                                        {% endif %}
+                                        <div class="position-absolute top-0 start-0 m-3">
+                                            <span class="badge badge-subtle-teal">
+                                                {{ c.categorie }}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-7 p-4 d-flex flex-column">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <div>
+                                                <h4 class="fw-bold text-white mb-1" id="courseLabel{{ c.id }}">{{ c.titre }}</h4>
+                                                <div class="text-muted small">
+                                                    Instructor: <strong class="text-light">{{ c.formateur }}</strong> &bull; Estimated Duration: {{ c.duree }}
+                                                </div>
+                                            </div>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+
+                                        <div class="my-3 d-flex gap-2 flex-wrap">
+                                            <span class="badge badge-subtle-emerald">
+                                                Level: {{ c.niveau }}
+                                            </span>
+                                            <span class="badge badge-subtle-teal">
+                                                {{ c.nombre_lecons }} Video Lessons
+                                            </span>
+                                            <span class="badge badge-subtle-amber">
+                                                Free Campus Access
+                                            </span>
+                                        </div>
+
+                                        <h6 class="text-white-50 small text-uppercase fw-bold mb-1">Learning Objectives:</h6>
+                                        <p class="text-muted small mb-3" style="line-height: 1.6;">{{ c.description }}</p>
+
+                                        <!-- Course Syllabus -->
+                                        <h6 class="text-white-50 small text-uppercase fw-bold mb-2">Syllabus &amp; Curriculum Breakdown:</h6>
+                                        <div class="list-group list-group-flush border border-secondary border-opacity-25 rounded-3 mb-4 small">
+                                            <div class="list-group-item bg-dark bg-opacity-50 text-white d-flex justify-content-between align-items-center py-2 border-secondary border-opacity-25">
+                                                <span><i class="bi bi-play-circle-fill text-success me-2"></i> 1. Introduction &amp; Theoretical Foundations</span>
+                                                <span class="text-muted">15 min</span>
+                                            </div>
+                                            <div class="list-group-item bg-dark bg-opacity-50 text-white d-flex justify-content-between align-items-center py-2 border-secondary border-opacity-25">
+                                                <span><i class="bi bi-laptop text-info me-2"></i> 2. Guided Practical Walkthrough &amp; Demonstration</span>
+                                                <span class="text-muted">30 min</span>
+                                            </div>
+                                            <div class="list-group-item bg-dark bg-opacity-50 text-white d-flex justify-content-between align-items-center py-2 border-secondary border-opacity-25">
+                                                <span><i class="bi bi-check2-square text-success me-2"></i> 3. Summary Review &amp; Knowledge Validation Quiz</span>
+                                                <span class="text-muted">15 min</span>
+                                            </div>
+                                        </div>
+
+                                        <!-- Modal Actions -->
+                                        <div class="d-flex justify-content-between align-items-center gap-2 pt-2 border-top border-secondary border-opacity-25 mt-auto">
+                                            {% if request.user.is_authenticated and request.user.is_staff %}
+                                            <a href="/admin/pages/minicours/{{ c.id }}/change/" class="btn btn-outline-secondary btn-sm" target="_blank" title="Edit in Django Admin">
+                                                <i class="bi bi-pencil me-1"></i> Admin
+                                            </a>
+                                            {% else %}
+                                            <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">
+                                                <i class="bi bi-x me-1"></i> Close
+                                            </button>
+                                            {% endif %}
+
+                                            <button 
+                                                type="button" 
+                                                class="btn btn-theme-secondary btn-sm"
+                                                onclick="BiblioLearn.demarrerCours('{{ c.titre|escapejs }}', 'courseModal{{ c.id }}')"
+                                            >
+                                                <i class="bi bi-play-circle-fill me-1"></i> Launch Video
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <!-- Empty State -->
+            <div class="col-12 text-center py-5">
+                <div class="p-5 bg-dark bg-opacity-50 rounded-4 border border-secondary border-opacity-25 mx-auto" style="max-width: 580px;">
+                    <div class="stat-icon-wrap mx-auto mb-3" style="width: 56px; height: 56px; font-size: 1.8rem;">
+                        <i class="bi bi-mortarboard text-warning"></i>
+                    </div>
+                    <h3 class="fw-bold text-white mb-2">No Mini-Courses Found</h3>
+                    <p class="text-muted mb-4">
+                        No courses matched your search criteria {% if query %}for <strong>"{{ query }}"</strong>{% endif %}. Try selecting another field or resetting filters.
+                    </p>
+                    <a href="{% url 'pages:mini_cours' %}" class="btn btn-theme-secondary btn-sm">
+                        <i class="bi bi-arrow-repeat me-1"></i> View All Courses
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Django Pagination -->
+        {% if page_obj.paginator.num_pages > 1 %}
+        <nav aria-label="Course pagination" class="mt-5 d-flex justify-content-center">
+            <ul class="pagination pagination-theme">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if selected_cat %}&categorie={{ selected_cat }}{% endif %}{% if selected_niveau %}&niveau={{ selected_niveau }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}" aria-label="Previous">
+                        <i class="bi bi-chevron-left"></i> Previous
+                    </a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link"><i class="bi bi-chevron-left"></i> Previous</span>
+                </li>
+                {% endif %}
+
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                    <li class="page-item active" aria-current="page">
+                        <span class="page-link">{{ num }}</span>
+                    </li>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}{% if query %}&q={{ query }}{% endif %}{% if selected_cat %}&categorie={{ selected_cat }}{% endif %}{% if selected_niveau %}&niveau={{ selected_niveau }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}">{{ num }}</a>
+                    </li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if selected_cat %}&categorie={{ selected_cat }}{% endif %}{% if selected_niveau %}&niveau={{ selected_niveau }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}" aria-label="Next">
+                        Next <i class="bi bi-chevron-right"></i>
+                    </a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">Next <i class="bi bi-chevron-right"></i></span>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

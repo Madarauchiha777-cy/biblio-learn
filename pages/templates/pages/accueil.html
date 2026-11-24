@@ -1,0 +1,726 @@
+{% extends "base.html" %}
+
+{% block title %}Home &bull; BiblioLearn ESMA Marrakech{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Hero Banner Specifique */
+    .hero-banner {
+        background: var(--bl-gradient-hero);
+        padding: 5.5rem 0 5rem;
+        position: relative;
+        overflow: hidden;
+        border-bottom: 1px solid var(--bl-border);
+        transition: background 0.3s ease;
+    }
+
+    .hero-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.55rem;
+        background: rgba(99, 102, 241, 0.12);
+        color: var(--bl-text-accent);
+        border: 1px solid rgba(99, 102, 241, 0.28);
+        padding: 0.4rem 1.1rem;
+        border-radius: 9999px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+    }
+
+    .hero-title {
+        font-size: clamp(2.3rem, 4.2vw, 3.5rem);
+        font-weight: 800;
+        line-height: 1.15;
+        letter-spacing: -0.035em;
+        margin-bottom: 1.35rem;
+    }
+
+    .gradient-text {
+        background: linear-gradient(135deg, #818cf8 0%, #38bdf8 50%, #c084fc 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .hero-subtitle {
+        font-size: 1.125rem;
+        color: var(--bl-text-muted);
+        line-height: 1.65;
+        margin-bottom: 2rem;
+        max-width: 580px;
+    }
+
+    /* Hero Search Bar */
+    .hero-search-box {
+        background: var(--bl-card-bg);
+        backdrop-filter: blur(16px);
+        border: 1px solid var(--bl-border);
+        border-radius: var(--bl-radius-lg);
+        padding: 0.45rem;
+        box-shadow: var(--bl-shadow-md);
+        transition: var(--bl-transition);
+    }
+    .hero-search-box:focus-within {
+        border-color: var(--bl-primary-light);
+        box-shadow: var(--bl-shadow-glow), var(--bl-shadow-md);
+    }
+
+    .hero-search-input {
+        background: transparent !important;
+        border: none !important;
+        color: var(--bl-heading) !important;
+        padding: 0.7rem 1.1rem;
+        width: 100%;
+        outline: none;
+        font-size: 0.95rem;
+    }
+
+    .hero-search-input::placeholder {
+        color: var(--bl-text-subtle);
+    }
+
+    /* Hero Showcase Card */
+    .hero-showcase {
+        position: relative;
+        border-radius: var(--bl-radius-xl);
+        overflow: hidden;
+        border: 1px solid var(--bl-border);
+        box-shadow: var(--bl-shadow-lg);
+    }
+
+    .hero-showcase img {
+        width: 100%;
+        height: 420px;
+        object-fit: cover;
+        display: block;
+    }
+
+    .hero-showcase-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to top, rgba(10, 15, 29, 0.95) 0%, rgba(10, 15, 29, 0.35) 55%, transparent 100%);
+        padding: 2rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+    }
+
+    .hero-floating-badge {
+        position: absolute;
+        top: 1.25rem;
+        right: 1.25rem;
+        background: rgba(15, 23, 42, 0.85);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        color: #ffffff;
+        font-size: 0.8rem;
+        font-weight: 600;
+        padding: 0.4rem 0.9rem;
+        border-radius: 9999px;
+    }
+
+    /* CTA Section */
+    .cta-banner {
+        background: radial-gradient(circle at 80% 20%, rgba(99, 102, 241, 0.22) 0%, transparent 50%),
+                    radial-gradient(circle at 20% 80%, rgba(6, 182, 212, 0.18) 0%, transparent 50%),
+                    var(--bl-card-bg);
+        border: 1px solid var(--bl-border);
+        border-radius: var(--bl-radius-xl);
+        padding: 3.5rem 2.5rem;
+        box-shadow: var(--bl-shadow-lg);
+        transition: background 0.3s ease;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- 1. Hero Section -->
+<section class="hero-banner">
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-7">
+                <div class="hero-pill">
+                    <i class="bi bi-mortarboard-fill text-warning"></i>
+                    <span>ESMA Marrakech Campus &bull; Academic Year 2026-2027</span>
+                </div>
+
+                <h1 class="hero-title">
+                    Empower Academic Discovery with <span class="gradient-text">{{ nom_projet }}</span>
+                </h1>
+
+                <p class="hero-subtitle">
+                    Intelligent university library and e-learning platform: discover physical collections, track book loans seamlessly, and build modern skills with self-paced faculty-led courses.
+                </p>
+
+                <!-- Search Box -->
+                <form action="{% url 'pages:livres' %}" method="get" class="hero-search-box d-flex align-items-center gap-2 mb-4">
+                    <i class="bi bi-search text-muted ms-3 fs-5"></i>
+                    <input 
+                        type="text" 
+                        name="q" 
+                        class="hero-search-input" 
+                        placeholder="Search by title, author, keyword, or ISBN..." 
+                        aria-label="Search books"
+                    >
+                    <button class="btn btn-theme-primary px-4 py-2 me-1 flex-shrink-0" type="submit">
+                        <i class="bi bi-search me-1"></i> Search
+                    </button>
+                </form>
+
+                <!-- Popular Academic Majors Quick Chips -->
+                <div class="d-flex align-items-center gap-2 flex-wrap mb-4">
+                    <span class="small text-muted fw-semibold me-1">Majors:</span>
+                    {% for cat in categories %}
+                    <a href="{% url 'pages:livres' %}?categorie={{ cat|urlencode }}" class="filter-btn-pill">
+                        {{ cat }}
+                    </a>
+                    {% endfor %}
+                </div>
+
+                <div class="d-flex gap-3 flex-wrap">
+                    <a href="{% url 'pages:livres' %}" class="btn btn-theme-primary">
+                        <i class="bi bi-journals me-2"></i> Explore Catalog
+                    </a>
+                    <a href="{% url 'pages:mini_cours' %}" class="btn btn-theme-outline">
+                        <i class="bi bi-play-circle me-2"></i> Mini-Courses &amp; Tutorials
+                    </a>
+                </div>
+            </div>
+
+            <!-- Hero Showcase Card -->
+            <div class="col-lg-5">
+                <div class="hero-showcase">
+                    <img src="https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=800&q=80" alt="ESMA Marrakech Central Library" loading="lazy">
+                    <div class="hero-floating-badge">
+                        <i class="bi bi-check-circle-fill text-success me-1"></i> 2026 Collection Open
+                    </div>
+                    <div class="hero-showcase-overlay">
+                        <span class="badge badge-subtle-emerald mb-2 w-fit-content px-3 py-1">Library Resources</span>
+                        <h4 class="fw-bold text-white mb-1">Central Campus Library &bull; ESMA</h4>
+                        <p class="small text-muted mb-0">Specialized stacks in aisles &bull; Digital research stations &bull; Quiet study areas</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 2. Statistics Section -->
+<div class="container stats-row">
+    <div class="row g-3">
+        {% for stat in stats %}
+        <div class="col-6 col-md-3">
+            <div class="stat-box">
+                <div class="stat-icon-wrap">
+                    <i class="bi {{ stat.icone }}"></i>
+                </div>
+                <div class="stat-val">{{ stat.valeur }}</div>
+                <div class="stat-txt">{{ stat.label }}</div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- 3. Featured Books Section -->
+<section class="py-5 mt-4" id="catalogue">
+    <div class="container pt-4">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end mb-4 gap-3">
+            <div>
+                <span class="badge badge-subtle-emerald px-3 py-1 mb-2">
+                    <i class="bi bi-star-fill me-1 text-warning"></i> Academic Highlights
+                </span>
+                <h2 class="h1 fw-bold text-white mb-1">Featured Books &amp; References</h2>
+                <p class="text-muted mb-0">Most consulted textbooks and curriculum references across all university departments.</p>
+            </div>
+            
+            <div>
+                <a href="{% url 'pages:livres' %}" class="btn btn-theme-outline btn-sm">
+                    View Full Catalog ({{ stats.0.valeur }}) <i class="bi bi-arrow-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Books Grid -->
+        <div class="row g-4">
+            {% for livre in livres %}
+            <div class="col-md-6 col-lg-4">
+                <div class="book-card">
+                    <!-- Book Cover -->
+                    <div class="book-cover-container">
+                        {% if livre.cover_url %}
+                        <img src="{{ livre.cover_url }}" alt="{{ livre.titre }}" class="book-cover-img" loading="lazy">
+                        {% else %}
+                        <div style="background: {{ livre.couleur_couverture }}; width: 100%; height: 100%;"></div>
+                        {% endif %}
+
+                        <div class="book-cover-overlay">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="book-cover-badge">
+                                    {{ livre.categorie }}
+                                </span>
+                                <span class="book-rating">
+                                    <i class="bi bi-star-fill text-warning"></i> {{ livre.note }}
+                                </span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-end">
+                                <div class="small fw-semibold text-white-50">
+                                    Edition {{ livre.annee_publication }}
+                                </div>
+                                <span class="badge bg-dark bg-opacity-75 text-white border border-secondary border-opacity-50">
+                                    <i class="bi {{ livre.icone }} me-1"></i> Book
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Book Body -->
+                    <div class="book-body">
+                        <h3 class="book-title" title="{{ livre.titre }}">{{ livre.titre }}</h3>
+                        <div class="book-author">
+                            <i class="bi bi-person text-success"></i> <span>{{ livre.auteur }}</span>
+                        </div>
+                        <p class="book-desc">
+                            {{ livre.description|default:"Core curriculum academic manual recommended for ESMA Marrakech university courses." }}
+                        </p>
+
+                        <div class="book-footer">
+                            <div>
+                                {% if livre.disponible and livre.nombre_exemplaires > 0 %}
+                                <span class="badge badge-subtle-emerald">
+                                    <i class="bi bi-check-circle me-1"></i> {{ livre.nombre_exemplaires }} in stock
+                                </span>
+                                {% else %}
+                                <span class="badge badge-subtle-rose">
+                                    <i class="bi bi-x-circle me-1"></i> Checked Out
+                                </span>
+                                {% endif %}
+                            </div>
+
+                            <button 
+                                type="button" 
+                                class="btn btn-sm btn-theme-outline"
+                                data-bs-toggle="modal" 
+                                data-bs-target="#bookModal{{ livre.id }}"
+                            >
+                                <i class="bi bi-eye me-1"></i> View Details
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Book Modal -->
+                <div class="modal fade" id="bookModal{{ livre.id }}" tabindex="-1" aria-labelledby="modalLabel{{ livre.id }}" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-body p-0">
+                                <div class="row g-0">
+                                    <div class="col-md-5 position-relative">
+                                        {% if livre.cover_url %}
+                                        <img src="{{ livre.cover_url }}" alt="{{ livre.titre }}" class="img-fluid h-100 w-100 rounded-start-4" style="object-fit: cover; min-height: 290px;">
+                                        {% else %}
+                                        <div style="background: {{ livre.couleur_couverture }}; height: 100%; min-height: 290px;" class="d-flex align-items-center justify-content-center text-white">
+                                            <i class="bi {{ livre.icone }} display-1"></i>
+                                        </div>
+                                        {% endif %}
+                                        <div class="position-absolute top-0 start-0 m-3">
+                                            <span class="badge badge-subtle-emerald">
+                                                {{ livre.categorie }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-7 p-4 d-flex flex-column">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <div>
+                                                <h4 class="fw-bold text-white mb-1" id="modalLabel{{ livre.id }}">{{ livre.titre }}</h4>
+                                                <div class="text-muted small">
+                                                    By <strong class="text-light">{{ livre.auteur }}</strong> &bull; Edition {{ livre.annee_publication }}
+                                                </div>
+                                            </div>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+
+                                        <div class="my-3 d-flex align-items-center gap-2">
+                                            <span class="badge badge-subtle-amber">
+                                                <i class="bi bi-star-fill text-warning me-1"></i> {{ livre.note }} / 5.0
+                                            </span>
+                                            {% if livre.disponible and livre.nombre_exemplaires > 0 %}
+                                            <span class="badge badge-subtle-emerald">
+                                                <i class="bi bi-check2-circle me-1"></i> {{ livre.nombre_exemplaires }} copies available
+                                            </span>
+                                            {% else %}
+                                            <span class="badge badge-subtle-rose">
+                                                <i class="bi bi-clock-history me-1"></i> Currently unavailable
+                                            </span>
+                                            {% endif %}
+                                        </div>
+
+                                        <h6 class="text-white-50 small text-uppercase fw-bold mb-1">Book Summary:</h6>
+                                        <p class="text-muted small mb-3 flex-grow-1" style="line-height: 1.6;">
+                                            {{ livre.description|default:"This title is part of the official curriculum references recommended to students for university coursework, projects, and research papers." }}
+                                        </p>
+
+                                        <!-- Metadata & Shelf Location -->
+                                        <div class="p-3 bg-dark bg-opacity-50 rounded-3 border border-secondary border-opacity-25 mb-3">
+                                            <div class="row g-2 small">
+                                                <div class="col-6">
+                                                    <span class="text-muted">ISBN Code:</span>
+                                                    <div class="fw-semibold text-white d-flex align-items-center gap-1">
+                                                        <span>{{ livre.isbn|default:"Not specified" }}</span>
+                                                        {% if livre.isbn %}
+                                                        <button class="btn btn-link btn-sm p-0 text-success" onclick="BiblioLearn.copierISBN('{{ livre.isbn }}')" title="Copy ISBN">
+                                                            <i class="bi bi-clipboard"></i>
+                                                        </button>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                                <div class="col-6">
+                                                    <span class="text-muted">Shelf Location:</span>
+                                                    <div class="fw-semibold text-white">Section B &bull; ESMA Marrakech</div>
+                                                </div>
+                                                <div class="col-6">
+                                                    <span class="text-muted">Loan Duration:</span>
+                                                    <div class="fw-semibold text-white">14 days (Renewable)</div>
+                                                </div>
+                                                <div class="col-6">
+                                                    <span class="text-muted">Checkout Desk:</span>
+                                                    <div class="fw-semibold text-white">Present Student Card</div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Modal Actions -->
+                                        <div class="d-flex justify-content-between align-items-center gap-2 pt-2 border-top border-secondary border-opacity-25">
+                                            {% if request.user.is_authenticated and request.user.is_staff %}
+                                            <a href="/admin/pages/livre/{{ livre.id }}/change/" class="btn btn-outline-secondary btn-sm" target="_blank" title="Edit in Django Admin">
+                                                <i class="bi bi-pencil me-1"></i> Admin
+                                            </a>
+                                            {% else %}
+                                            <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">
+                                                <i class="bi bi-x me-1"></i> Close
+                                            </button>
+                                            {% endif %}
+
+                                            {% if livre.disponible and livre.nombre_exemplaires > 0 %}
+                                            <button 
+                                                type="button" 
+                                                class="btn btn-theme-primary btn-sm"
+                                                onclick="BiblioLearn.simulerEmprunt('{{ livre.titre|escapejs }}', 'bookModal{{ livre.id }}')"
+                                            >
+                                                <i class="bi bi-check2-circle me-1"></i> Reserve at Desk
+                                            </button>
+                                            {% else %}
+                                            <button type="button" class="btn btn-outline-warning btn-sm" disabled>
+                                                <i class="bi bi-clock me-1"></i> Copies Checked Out
+                                            </button>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- 4. Main Platform Features -->
+<section class="py-5 bg-dark bg-opacity-50 border-top border-bottom border-secondary border-opacity-25" id="modules">
+    <div class="container py-3">
+        <div class="text-center mb-5">
+            <span class="badge badge-subtle-emerald px-3 py-1 mb-2">
+                <i class="bi bi-grid-3x3-gap me-1"></i> Integrated Ecosystem
+            </span>
+            <h2 class="h1 fw-bold text-white">The 4 Core Pillars of BiblioLearn</h2>
+            <p class="text-muted mx-auto" style="max-width: 620px;">
+                An integrated academic architecture tailored to meet the needs of students, researchers, faculty, librarians, and campus administration.
+            </p>
+        </div>
+
+        <div class="row g-4">
+            {% for mod in modules %}
+            <div class="col-md-6 col-lg-3">
+                <div class="module-detail-card">
+                    <div class="module-img-banner">
+                        <img src="{{ mod.image }}" alt="{{ mod.nom }}" loading="lazy">
+                        <div class="module-img-overlay">
+                            <span class="badge badge-subtle-emerald">{{ mod.badge }}</span>
+                            <div class="module-header-icon" style="background: var(--bl-gradient-primary);">
+                                <i class="bi {{ mod.icone }}"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-4 d-flex flex-column flex-grow-1">
+                        <h4 class="h5 fw-bold text-white mb-2">{{ mod.nom }}</h4>
+                        <p class="text-muted small mb-4 flex-grow-1" style="line-height: 1.6;">
+                            {{ mod.description }}
+                        </p>
+
+                        <a href="{{ mod.url }}" class="btn btn-theme-outline btn-sm w-100">
+                            {{ mod.action }} <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- 5. Popular Mini-Courses Section -->
+<section class="py-5" id="minicours">
+    <div class="container py-3">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end mb-4 gap-3">
+            <div>
+                <span class="badge badge-subtle-teal px-3 py-1 mb-2">
+                    <i class="bi bi-play-circle-fill me-1 text-info"></i> Self-paced Learning &bull; Digital Capsules
+                </span>
+                <h2 class="h1 fw-bold text-white mb-1">Popular Mini-Courses &amp; Masterclasses</h2>
+                <p class="text-muted mb-0">Build high-demand academic and technical skills through bite-sized modules taught by your professors.</p>
+            </div>
+            
+            <a href="{% url 'pages:mini_cours' %}" class="btn btn-theme-secondary btn-sm">
+                Explore All Courses ({{ stats.2.valeur }}) <i class="bi bi-arrow-right ms-1"></i>
+            </a>
+        </div>
+
+        <div class="row g-4">
+            {% for c in cours %}
+            <div class="col-md-6 col-lg-4">
+                <div class="course-card">
+                    <div class="course-cover-container">
+                        {% if c.cover_url %}
+                        <img src="{{ c.cover_url }}" alt="{{ c.titre }}" class="course-cover-img" loading="lazy">
+                        {% else %}
+                        <div style="background: {{ c.couleur }}; width: 100%; height: 100%;"></div>
+                        {% endif %}
+
+                        <div class="course-cover-overlay">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="book-cover-badge">{{ c.categorie }}</span>
+                                {% if c.populaire %}
+                                <span class="badge bg-warning text-dark fw-bold">
+                                    <i class="bi bi-fire me-1"></i> Popular
+                                </span>
+                                {% endif %}
+                            </div>
+                            <div class="d-flex justify-content-between align-items-end">
+                                <span class="badge bg-dark bg-opacity-75 text-white border border-secondary border-opacity-50">
+                                    Level: {{ c.niveau }}
+                                </span>
+                                <span class="badge badge-subtle-emerald">
+                                    <i class="bi bi-collection-play me-1"></i> {{ c.nombre_lecons }} lessons
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="course-body">
+                        <h4 class="course-title" title="{{ c.titre }}">{{ c.titre }}</h4>
+                        <div class="course-teacher">
+                            <i class="bi bi-person-video3 text-info"></i> <span>{{ c.formateur }}</span>
+                        </div>
+                        <p class="course-desc">
+                            {{ c.description }}
+                        </p>
+
+                        <div class="course-meta">
+                            <span><i class="bi bi-clock text-warning me-1"></i> {{ c.duree }}</span>
+                            <span><i class="bi bi-layers text-success me-1"></i> {{ c.nombre_lecons }} units</span>
+                            <span class="text-success"><i class="bi bi-check2-circle me-1"></i> Free Access</span>
+                        </div>
+
+                        <div class="course-footer">
+                            <span class="badge bg-dark border border-secondary border-opacity-50 text-muted">
+                                ESMA Online
+                            </span>
+
+                            <a href="{% url 'pages:mini_cours' %}" class="btn btn-theme-secondary btn-sm">
+                                <i class="bi bi-play-fill me-1"></i> Start Course
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- 6. Campus & Infrastructure Section -->
+<section class="py-5 bg-dark bg-opacity-50 border-top border-bottom border-secondary border-opacity-25">
+    <div class="container py-3">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6">
+                <div class="position-relative">
+                    <img 
+                        src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=800&q=80" 
+                        alt="ESMA Marrakech Campus Students" 
+                        class="img-fluid rounded-4 shadow-lg border border-secondary border-opacity-25"
+                        loading="lazy"
+                    >
+                    <div class="position-absolute bottom-0 start-0 m-4 p-3 bg-dark bg-opacity-90 rounded-3 shadow border border-secondary border-opacity-50 d-flex align-items-center gap-3 backdrop-blur">
+                        <div class="brand-logo-icon" style="width: 36px; height: 36px; font-size: 1.1rem;">
+                            <i class="bi bi-mortarboard-fill"></i>
+                        </div>
+                        <div>
+                            <div class="fw-bold text-white">ESMA Marrakech Campus</div>
+                            <div class="small text-muted">Academic Excellence &bull; Active Learning</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <span class="badge badge-subtle-emerald px-3 py-1 mb-2">
+                    University Facilities
+                </span>
+                <h2 class="h1 fw-bold text-white mb-3">An Environment Designed for Academic Success</h2>
+                <p class="text-muted mb-4" style="line-height: 1.7;">
+                    The ESMA Marrakech Central Library provides students and researchers with quiet study zones, collaborative work hubs, high-speed connected workstations, and dedicated librarian guidance for thesis writing and research projects.
+                </p>
+
+                <div class="row g-3">
+                    <div class="col-sm-6">
+                        <div class="p-3 bg-dark bg-opacity-75 rounded-3 border border-secondary border-opacity-25">
+                            <div class="fw-bold text-white mb-1">
+                                <i class="bi bi-wifi text-success me-2"></i> High-Speed Campus WiFi
+                            </div>
+                            <div class="small text-muted">Free, secure broadband access available across the entire campus.</div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="p-3 bg-dark bg-opacity-75 rounded-3 border border-secondary border-opacity-25">
+                            <div class="fw-bold text-white mb-1">
+                                <i class="bi bi-clock-history text-success me-2"></i> Easy Online Extensions
+                            </div>
+                            <div class="small text-muted">Renew book loans online 24/7 without needing to visit the desk.</div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="p-3 bg-dark bg-opacity-75 rounded-3 border border-secondary border-opacity-25">
+                            <div class="fw-bold text-white mb-1">
+                                <i class="bi bi-display text-success me-2"></i> Digital Workstations
+                            </div>
+                            <div class="small text-muted">Access to scientific research databases and international journals.</div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="p-3 bg-dark bg-opacity-75 rounded-3 border border-secondary border-opacity-25">
+                            <div class="fw-bold text-white mb-1">
+                                <i class="bi bi-person-check-fill text-success me-2"></i> Research Support
+                            </div>
+                            <div class="small text-muted">Individual methodological coaching for capstone and thesis writing.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 7. FAQ Accordion Section -->
+<section class="py-5" id="faq">
+    <div class="container py-3">
+        <div class="text-center mb-5">
+            <span class="badge badge-subtle-amber px-3 py-1 mb-2">
+                <i class="bi bi-question-circle-fill me-1"></i> Frequently Asked Questions
+            </span>
+            <h2 class="h1 fw-bold text-white">Everything You Need to Know About BiblioLearn</h2>
+            <p class="text-muted mx-auto" style="max-width: 600px;">
+                Find quick answers to common questions about book checkout policies, renewals, student quotas, and online courses.
+            </p>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-9">
+                <div class="accordion accordion-theme" id="faqAccordion">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingOne">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                <i class="bi bi-book-half me-2 text-success"></i> How do I borrow a physical book from the campus library?
+                            </button>
+                        </h2>
+                        <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Search for the book in the online catalog, confirm that the status indicates "Available", note its shelf location code, and present your ESMA student ID card at the central circulation desk. The librarian will issue the book to your account in seconds.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingTwo">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                <i class="bi bi-clock-history me-2 text-success"></i> What is the loan duration and how can I renew a book?
+                            </button>
+                        </h2>
+                        <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Students may borrow up to <strong>3 books simultaneously</strong> for a period of <strong>14 days</strong>. Faculty members benefit from a 6-book quota for 30 days. Loans can be renewed once online through your account as long as no other user has placed a reservation hold.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingThree">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                <i class="bi bi-mortarboard me-2 text-success"></i> Are the online mini-courses free of charge?
+                            </button>
+                        </h2>
+                        <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Yes! All self-paced training capsules (thesis research methods, Python &amp; Django development, UI/UX prototyping with Figma, and AI tools for research) are completely free and open to all registered ESMA Marrakech students and faculty.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingFour">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                                <i class="bi bi-shield-lock me-2 text-success"></i> Who has access to the Django administration portal (/admin/)?
+                            </button>
+                        </h2>
+                        <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Access to the Django administration backend is restricted to authorized librarians and system administrators. It enables adding new catalog acquisitions, managing inventory levels, publishing mini-courses, and governing access permissions.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 8. Call to Action Banner -->
+<section class="py-5">
+    <div class="container">
+        <div class="cta-banner text-center text-lg-start d-flex flex-column flex-lg-row align-items-center justify-content-between gap-4">
+            <div>
+                <span class="badge badge-subtle-emerald px-3 py-1 mb-2">Join the Community</span>
+                <h3 class="display-6 fw-bold text-white mb-2">Ready to elevate your academic journey?</h3>
+                <p class="text-muted mb-0" style="max-width: 550px;">
+                    Explore our comprehensive collection online or visit the central library desk at ESMA Marrakech.
+                </p>
+            </div>
+            <div class="d-flex gap-3 flex-wrap flex-shrink-0">
+                <a href="{% url 'pages:livres' %}" class="btn btn-theme-primary px-4 py-2">
+                    <i class="bi bi-journals me-2"></i> Books Catalog
+                </a>
+                <a href="{% url 'pages:mini_cours' %}" class="btn btn-theme-outline px-4 py-2">
+                    <i class="bi bi-mortarboard me-2"></i> Mini-Courses
+                </a>
+                {% if request.user.is_authenticated and request.user.is_staff %}
+                <a href="{% url 'pages:dashboard_admin' %}" class="btn btn-theme-outline px-4 py-2 border-success text-success">
+                    <i class="bi bi-shield-lock-fill me-2"></i> Admin Console
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

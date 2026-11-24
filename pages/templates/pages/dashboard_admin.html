@@ -1,0 +1,789 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="BiblioLearn Staff Administration Console — ESMA Marrakech University.">
+    <title>Admin Console &bull; BiblioLearn ESMA Marrakech</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap 5.3.3 & Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+
+    <!-- BiblioLearn Base Stylesheet -->
+    <link rel="stylesheet" href="{% static 'css/bibliolearn.css' %}">
+
+    <!-- Anti-flicker Dual Theme Initialization Script -->
+    <script>
+        (function() {
+            try {
+                const stored = localStorage.getItem('bibliolearn_theme') || 'dark';
+                const effective = stored === 'auto' 
+                    ? (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark')
+                    : stored;
+                document.documentElement.setAttribute('data-bs-theme', effective);
+            } catch (e) {}
+        })();
+    </script>
+
+    <style>
+        :root {
+            --bl-admin-sidebar-bg: var(--bl-surface);
+            --bl-admin-card-bg: var(--bl-card-bg);
+            --bl-admin-card-border: var(--bl-border);
+            --bl-admin-hover-bg: var(--bl-card-hover);
+        }
+
+        body {
+            background-color: var(--bl-bg);
+            color: var(--bl-text-main);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            min-height: 100vh;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .admin-topbar {
+            background: var(--bl-navbar-bg);
+            border-bottom: 1px solid var(--bl-admin-card-border);
+            padding: 0.85rem 1.5rem;
+            position: sticky;
+            top: 0;
+            z-index: 1030;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+            backdrop-filter: blur(16px);
+        }
+
+        .admin-brand {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: var(--bl-heading);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .admin-badge-role {
+            background: rgba(99, 102, 241, 0.16);
+            color: var(--bl-text-accent);
+            border: 1px solid rgba(99, 102, 241, 0.32);
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 0.25rem 0.6rem;
+            border-radius: 9999px;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .admin-metric-card {
+            background: var(--bl-admin-card-bg);
+            border: 1px solid var(--bl-admin-card-border);
+            border-radius: 1rem;
+            padding: 1.4rem;
+            transition: all 0.2s ease;
+        }
+        .admin-metric-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--bl-primary-light);
+            box-shadow: var(--bl-shadow-glow), var(--bl-shadow-md);
+        }
+
+        .metric-icon-wrap {
+            width: 48px;
+            height: 48px;
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.35rem;
+        }
+
+        .metric-icon-indigo { background: rgba(99, 102, 241, 0.15); color: #818cf8; }
+        .metric-icon-cyan { background: rgba(6, 182, 212, 0.15); color: #22d3ee; }
+        .metric-icon-emerald { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+        .metric-icon-teal { background: rgba(20, 184, 166, 0.15); color: #14b8a6; }
+        .metric-icon-amber { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
+        .metric-icon-rose { background: rgba(244, 63, 94, 0.15); color: #f43f5e; }
+
+        .admin-content-card {
+            background: var(--bl-admin-card-bg);
+            border: 1px solid var(--bl-admin-card-border);
+            border-radius: 1rem;
+            padding: 1.75rem;
+            box-shadow: var(--bl-shadow-md);
+        }
+
+        .nav-tabs-admin {
+            border-bottom: 1px solid var(--bl-admin-card-border);
+            gap: 0.5rem;
+        }
+        .nav-tabs-admin .nav-link {
+            color: var(--bl-text-muted);
+            font-weight: 600;
+            font-size: 0.95rem;
+            padding: 0.75rem 1.25rem;
+            border-radius: 0.75rem 0.75rem 0 0;
+            border: 1px solid transparent;
+            transition: all 0.2s ease;
+        }
+        .nav-tabs-admin .nav-link:hover {
+            color: var(--bl-heading);
+            background: rgba(99, 102, 241, 0.08);
+            border-color: transparent;
+        }
+        .nav-tabs-admin .nav-link.active {
+            color: var(--bl-text-accent);
+            background: var(--bl-admin-card-bg);
+            border-color: var(--bl-admin-card-border) var(--bl-admin-card-border) transparent var(--bl-admin-card-border);
+            border-top: 2px solid var(--bl-primary);
+        }
+
+        .table-admin {
+            --bs-table-bg: transparent;
+            --bs-table-color: var(--bl-text-main);
+            border-color: var(--bl-admin-card-border);
+            vertical-align: middle;
+        }
+        .table-admin th {
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--bl-text-muted);
+            background: var(--bl-surface-muted);
+            padding: 0.85rem 1rem;
+            border-bottom: 2px solid var(--bl-admin-card-border);
+        }
+        .table-admin td {
+            padding: 0.9rem 1rem;
+            border-bottom: 1px solid var(--bl-admin-card-border);
+            font-size: 0.88rem;
+        }
+        .table-admin tr:hover td {
+            background-color: var(--bl-admin-hover-bg);
+        }
+
+        .cover-thumb {
+            width: 44px;
+            height: 56px;
+            border-radius: 6px;
+            object-fit: cover;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .cover-thumb-fallback {
+            width: 44px;
+            height: 56px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 1.1rem;
+        }
+
+        .modal-content-admin {
+            background: var(--bl-modal-bg);
+            border: 1px solid var(--bl-admin-card-border);
+            border-radius: 1.25rem;
+            color: var(--bl-text-main);
+            box-shadow: var(--bl-shadow-lg);
+        }
+        .modal-header-admin {
+            border-bottom: 1px solid var(--bl-admin-card-border);
+            padding: 1.25rem 1.5rem;
+        }
+        .modal-footer-admin {
+            border-top: 1px solid var(--bl-admin-card-border);
+            padding: 1.25rem 1.5rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Dedicated Admin Topbar -->
+    <header class="admin-topbar">
+        <div class="container-fluid d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center gap-3">
+                <a href="{% url 'pages:dashboard_admin' %}" class="admin-brand">
+                    <div class="brand-logo-icon" style="width: 36px; height: 36px; font-size: 1.1rem;">
+                        <i class="bi bi-shield-lock-fill"></i>
+                    </div>
+                    <div>
+                        <span>BiblioLearn</span>
+                        <span class="d-none d-md-inline text-muted fs-6 fw-normal"> | Staff Admin Console</span>
+                    </div>
+                </a>
+                <span class="admin-badge-role d-none d-sm-inline">
+                    <i class="bi bi-person-badge me-1"></i> Staff / Librarian
+                </span>
+            </div>
+
+            <div class="d-flex align-items-center gap-2">
+                <!-- Dual-Mode Theme Switcher -->
+                <div class="dropdown">
+                    <button class="btn btn-theme-switcher btn-sm" id="bd-theme" type="button" aria-expanded="false" data-bs-toggle="dropdown" aria-label="Toggle theme">
+                        <i class="bi bi-moon-stars-fill" id="themeActiveIcon"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end border-secondary border-opacity-25 shadow-lg py-2" aria-labelledby="bd-theme">
+                        <li>
+                            <button type="button" class="dropdown-item d-flex align-items-center justify-content-between" data-bs-theme-value="light">
+                                <span class="d-flex align-items-center"><i class="bi bi-sun-fill me-2 text-warning"></i> Light</span>
+                                <i class="bi bi-check2 theme-check-icon text-primary ms-3 d-none"></i>
+                            </button>
+                        </li>
+                        <li>
+                            <button type="button" class="dropdown-item d-flex align-items-center justify-content-between" data-bs-theme-value="dark">
+                                <span class="d-flex align-items-center"><i class="bi bi-moon-stars-fill me-2 text-primary"></i> Dark</span>
+                                <i class="bi bi-check2 theme-check-icon text-primary ms-3 d-none"></i>
+                            </button>
+                        </li>
+                        <li><hr class="dropdown-divider border-secondary border-opacity-25"></li>
+                        <li>
+                            <button type="button" class="dropdown-item d-flex align-items-center justify-content-between" data-bs-theme-value="auto">
+                                <span class="d-flex align-items-center"><i class="bi bi-circle-half me-2 text-info"></i> Auto</span>
+                                <i class="bi bi-check2 theme-check-icon text-primary ms-3 d-none"></i>
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+
+                <a href="{% url 'pages:accueil' %}" class="btn btn-sm btn-outline-secondary text-nowrap" target="_blank" title="View Public Student Site">
+                    <i class="bi bi-arrow-up-right-square me-1"></i>
+                    <span class="d-none d-sm-inline">Student Site</span>
+                </a>
+                <a href="/admin/" class="btn btn-sm btn-theme-outline text-nowrap" title="Native Django Superuser Admin">
+                    <i class="bi bi-sliders me-1"></i>
+                    <span class="d-none d-sm-inline">Django Admin</span>
+                </a>
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-theme-primary dropdown-toggle text-nowrap" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-person-circle me-1"></i> {{ request.user.username|default:"Admin" }}
+                    </button>
+                    <ul class="dropdown-menu border-secondary border-opacity-25 dropdown-menu-end shadow-lg">
+                        <li class="dropdown-header text-muted small">Signed in as staff</li>
+                        <li><a class="dropdown-item" href="{% url 'pages:dashboard_admin' %}"><i class="bi bi-speedometer2 me-2 text-success"></i>Dashboard Home</a></li>
+                        <li><a class="dropdown-item" href="/admin/pages/livre/"><i class="bi bi-book me-2 text-info"></i>Django Books Table</a></li>
+                        <li><a class="dropdown-item" href="/admin/pages/minicours/"><i class="bi bi-mortarboard me-2 text-warning"></i>Django Courses Table</a></li>
+                        <li><hr class="dropdown-divider border-secondary border-opacity-25"></li>
+                        <li><a class="dropdown-item text-danger" href="/admin/logout/"><i class="bi bi-box-arrow-right me-2"></i>Sign Out</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="container-fluid py-4 px-lg-4">
+
+        <!-- Django Feedback Alerts -->
+        {% if messages %}
+        <div class="mb-4">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show border-0 shadow-sm d-flex align-items-center gap-2" role="alert">
+                <i class="bi {% if message.tags == 'success' %}bi-check-circle-fill text-success{% elif message.tags == 'error' %}bi-exclamation-triangle-fill text-danger{% else %}bi-info-circle-fill text-info{% endif %} fs-5"></i>
+                <div class="flex-grow-1">{{ message }}</div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Dashboard Header -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+            <div>
+                <h1 class="h3 fw-bold text-white mb-1">Library &amp; E-Learning Management</h1>
+                <p class="text-muted small mb-0">
+                    ESMA Marrakech Academic Repository &bull; Real-time catalog control, loan status toggling, and course publishing.
+                </p>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <button type="button" class="btn btn-theme-primary btn-sm px-3" data-bs-toggle="modal" data-bs-target="#addBookModal">
+                    <i class="bi bi-plus-lg me-1"></i> Add New Book
+                </button>
+                <button type="button" class="btn btn-theme-outline btn-sm px-3" data-bs-toggle="modal" data-bs-target="#addCourseModal">
+                    <i class="bi bi-mortarboard-fill me-1"></i> Add Mini-Course
+                </button>
+            </div>
+        </div>
+
+        <!-- 4 KPI Metric Cards -->
+        <div class="row g-3 mb-4">
+            <div class="col-sm-6 col-xl-3">
+                <div class="admin-metric-card d-flex align-items-center gap-3">
+                    <div class="metric-icon-wrap metric-icon-indigo">
+                        <i class="bi bi-journal-bookmark-fill"></i>
+                    </div>
+                    <div>
+                        <div class="small text-muted fw-semibold">Total Titles</div>
+                        <div class="h3 fw-bold text-white mb-0">{{ total_livres }}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="admin-metric-card d-flex align-items-center gap-3">
+                    <div class="metric-icon-wrap metric-icon-cyan">
+                        <i class="bi bi-check2-circle"></i>
+                    </div>
+                    <div>
+                        <div class="small text-muted fw-semibold">In Stacks (Available)</div>
+                        <div class="h3 fw-bold text-success mb-0">{{ total_disponibles }}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="admin-metric-card d-flex align-items-center gap-3">
+                    <div class="metric-icon-wrap metric-icon-amber">
+                        <i class="bi bi-arrow-repeat"></i>
+                    </div>
+                    <div>
+                        <div class="small text-muted fw-semibold">On Loan / Borrowed</div>
+                        <div class="h3 fw-bold text-warning mb-0">{{ total_pretes }}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="admin-metric-card d-flex align-items-center gap-3">
+                    <div class="metric-icon-wrap metric-icon-rose">
+                        <i class="bi bi-play-circle-fill"></i>
+                    </div>
+                    <div>
+                        <div class="small text-muted fw-semibold">E-Learning Courses</div>
+                        <div class="h3 fw-bold text-white mb-0">{{ total_cours }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabbed Navigation -->
+        <ul class="nav nav-tabs nav-tabs-admin mb-3" id="adminTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <a class="nav-link {% if active_tab != 'cours' %}active{% endif %}" id="books-tab" href="{% url 'pages:dashboard_admin' %}?tab=livres" role="tab">
+                    <i class="bi bi-book me-2"></i> Books Catalog ({{ total_livres }})
+                </a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link {% if active_tab == 'cours' %}active{% endif %}" id="courses-tab" href="{% url 'pages:dashboard_admin' %}?tab=cours" role="tab">
+                    <i class="bi bi-mortarboard me-2"></i> Mini-Courses ({{ total_cours }})
+                </a>
+            </li>
+        </ul>
+
+        <!-- Content Area -->
+        <div class="admin-content-card">
+            {% if active_tab != 'cours' %}
+            <!-- ================= BOOKS MANAGEMENT TAB ================= -->
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+                <div class="d-flex align-items-center gap-2">
+                    <h2 class="h5 fw-bold text-white mb-0">Library Book Inventory</h2>
+                    <span class="badge bg-secondary bg-opacity-25 text-white-50 border border-secondary border-opacity-25">{{ livres|length }} item{{ livres|length|pluralize }}</span>
+                </div>
+                <!-- Search Filter Form -->
+                <form method="get" action="{% url 'pages:dashboard_admin' %}" class="d-flex gap-2">
+                    <input type="hidden" name="tab" value="livres">
+                    <div class="input-group input-group-sm" style="min-width: 280px;">
+                        <span class="input-group-text bg-dark border-secondary border-opacity-50 text-muted">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text" name="q" class="form-control form-control-sm bg-dark text-white border-secondary border-opacity-50" placeholder="Filter by title, author, ISBN..." value="{{ search_q }}">
+                    </div>
+                    <button type="submit" class="btn btn-sm btn-theme-primary">Filter</button>
+                    {% if search_q %}
+                    <a href="{% url 'pages:dashboard_admin' %}?tab=livres" class="btn btn-sm btn-outline-secondary">Reset</a>
+                    {% endif %}
+                </form>
+            </div>
+
+            <!-- Responsive Books Table -->
+            <div class="table-responsive">
+                <table class="table table-admin align-middle">
+                    <thead>
+                        <tr>
+                            <th style="width: 60px;">Cover</th>
+                            <th>Title &amp; Author</th>
+                            <th>Category</th>
+                            <th>ISBN &amp; Year</th>
+                            <th class="text-center">Stock Copies</th>
+                            <th class="text-center">Availability Status</th>
+                            <th class="text-center">Quick Toggle</th>
+                            <th class="text-end">Manage</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for livre in livres %}
+                        <tr>
+                            <!-- Cover thumbnail -->
+                            <td>
+                                {% if livre.cover_url %}
+                                <img src="{{ livre.cover_url }}" alt="{{ livre.titre }}" class="cover-thumb">
+                                {% else %}
+                                <div class="cover-thumb-fallback" style="background: {{ livre.couleur_couverture }};">
+                                    <i class="bi {{ livre.icone }}"></i>
+                                </div>
+                                {% endif %}
+                            </td>
+                            <!-- Title & Author -->
+                            <td>
+                                <div class="fw-bold text-white mb-1">{{ livre.titre }}</div>
+                                <div class="small text-muted"><i class="bi bi-person me-1"></i>{{ livre.auteur }}</div>
+                            </td>
+                            <!-- Category -->
+                            <td>
+                                <span class="badge badge-subtle-emerald">{{ livre.categorie }}</span>
+                            </td>
+                            <!-- ISBN & Year -->
+                            <td>
+                                <div class="font-monospace small text-white-50">{{ livre.isbn }}</div>
+                                <div class="small text-muted">Published: {{ livre.annee_publication }}</div>
+                            </td>
+                            <!-- Copies -->
+                            <td class="text-center">
+                                <span class="fw-bold text-white">{{ livre.nombre_exemplaires }}</span>
+                                <span class="small text-muted d-block">copies</span>
+                            </td>
+                            <!-- Status -->
+                            <td class="text-center">
+                                {% if livre.disponible and livre.nombre_exemplaires > 0 %}
+                                <span class="badge badge-subtle-emerald px-2 py-1">
+                                    <i class="bi bi-check-circle-fill me-1"></i> In Stacks
+                                </span>
+                                {% else %}
+                                <span class="badge badge-subtle-rose px-2 py-1">
+                                    <i class="bi bi-x-circle-fill me-1"></i> Checked Out
+                                </span>
+                                {% endif %}
+                            </td>
+                            <!-- Quick Toggle Action -->
+                            <td class="text-center">
+                                <a href="{% url 'pages:toggle_dispo_livre' livre.id %}" class="btn btn-sm {% if livre.disponible %}btn-outline-warning{% else %}btn-outline-success{% endif %} py-1 px-2 text-nowrap" title="Click to invert availability status">
+                                    {% if livre.disponible %}
+                                    <i class="bi bi-toggle-on text-success me-1"></i> Set Out
+                                    {% else %}
+                                    <i class="bi bi-toggle-off text-muted me-1"></i> Set In
+                                    {% endif %}
+                                </a>
+                            </td>
+                            <!-- Manage Links -->
+                            <td class="text-end">
+                                <div class="btn-group btn-group-sm">
+                                    <a href="/admin/pages/livre/{{ livre.id }}/change/" class="btn btn-outline-secondary" target="_blank" title="Edit in Django Admin">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a href="{% url 'pages:livres' %}?q={{ livre.isbn }}" class="btn btn-outline-secondary" target="_blank" title="View in Student Catalog">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="8" class="text-center py-5 text-muted">
+                                <i class="bi bi-inbox fs-2 d-block mb-2 text-secondary"></i>
+                                No books found matching your criteria.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            {% else %}
+            <!-- ================= MINI-COURSES MANAGEMENT TAB ================= -->
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+                <div class="d-flex align-items-center gap-2">
+                    <h2 class="h5 fw-bold text-white mb-0">E-Learning Video Modules</h2>
+                    <span class="badge bg-secondary bg-opacity-25 text-white-50 border border-secondary border-opacity-25">{{ cours|length }} course{{ cours|length|pluralize }}</span>
+                </div>
+                <!-- Search Form -->
+                <form method="get" action="{% url 'pages:dashboard_admin' %}" class="d-flex gap-2">
+                    <input type="hidden" name="tab" value="cours">
+                    <div class="input-group input-group-sm" style="min-width: 280px;">
+                        <span class="input-group-text bg-dark border-secondary border-opacity-50 text-muted">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text" name="q" class="form-control form-control-sm bg-dark text-white border-secondary border-opacity-50" placeholder="Filter by title or instructor..." value="{{ search_q }}">
+                    </div>
+                    <button type="submit" class="btn btn-sm btn-theme-primary">Filter</button>
+                    {% if search_q %}
+                    <a href="{% url 'pages:dashboard_admin' %}?tab=cours" class="btn btn-sm btn-outline-secondary">Reset</a>
+                    {% endif %}
+                </form>
+            </div>
+
+            <!-- Responsive Courses Table -->
+            <div class="table-responsive">
+                <table class="table table-admin align-middle">
+                    <thead>
+                        <tr>
+                            <th style="width: 60px;">Thumbnail</th>
+                            <th>Course Title &amp; Instructor</th>
+                            <th>Category</th>
+                            <th>Academic Level</th>
+                            <th class="text-center">Duration</th>
+                            <th class="text-center">Lessons</th>
+                            <th class="text-center">Featured Status</th>
+                            <th class="text-end">Manage</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for c in cours %}
+                        <tr>
+                            <!-- Thumbnail -->
+                            <td>
+                                {% if c.cover_url %}
+                                <img src="{{ c.cover_url }}" alt="{{ c.titre }}" class="cover-thumb">
+                                {% else %}
+                                <div class="cover-thumb-fallback" style="background: linear-gradient(135deg, #059669, #0d9488);">
+                                    <i class="bi bi-play-btn"></i>
+                                </div>
+                                {% endif %}
+                            </td>
+                            <!-- Title & Instructor -->
+                            <td>
+                                <div class="fw-bold text-white mb-1">{{ c.titre }}</div>
+                                <div class="small text-muted"><i class="bi bi-person-video3 me-1"></i>{{ c.formateur }}</div>
+                            </td>
+                            <!-- Category -->
+                            <td>
+                                <span class="badge badge-subtle-emerald">{{ c.categorie }}</span>
+                            </td>
+                            <!-- Level -->
+                            <td>
+                                <span class="badge bg-secondary bg-opacity-25 text-white-50 border border-secondary border-opacity-50">{{ c.niveau }}</span>
+                            </td>
+                            <!-- Duration -->
+                            <td class="text-center">
+                                <span class="fw-semibold text-white">{{ c.duree_minutes }} min</span>
+                            </td>
+                            <!-- Lessons -->
+                            <td class="text-center">
+                                <span class="fw-semibold text-white">{{ c.nombre_lecons }}</span>
+                                <span class="small text-muted d-block">capsules</span>
+                            </td>
+                            <!-- Featured -->
+                            <td class="text-center">
+                                {% if c.populaire %}
+                                <span class="badge badge-subtle-amber px-2 py-1">
+                                    <i class="bi bi-star-fill text-warning me-1"></i> Featured
+                                </span>
+                                {% else %}
+                                <span class="badge bg-dark text-muted border border-secondary border-opacity-50">Standard</span>
+                                {% endif %}
+                            </td>
+                            <!-- Manage -->
+                            <td class="text-end">
+                                <div class="btn-group btn-group-sm">
+                                    <a href="/admin/pages/minicours/{{ c.id }}/change/" class="btn btn-outline-secondary" target="_blank" title="Edit in Django Admin">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a href="{% url 'pages:mini_cours' %}?q={{ c.titre|urlencode }}" class="btn btn-outline-secondary" target="_blank" title="View in Student Catalog">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="8" class="text-center py-5 text-muted">
+                                <i class="bi bi-inbox fs-2 d-block mb-2 text-secondary"></i>
+                                No mini-courses found matching your criteria.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% endif %}
+        </div>
+    </main>
+
+    <!-- Modal: Add New Book with Image File Upload -->
+    <div class="modal fade" id="addBookModal" tabindex="-1" aria-labelledby="addBookModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content modal-content-admin">
+                <form action="{% url 'pages:ajouter_livre_admin' %}" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="modal-header modal-header-admin">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="stat-icon-wrap" style="width: 36px; height: 36px; font-size: 1.1rem; background: rgba(16, 185, 129, 0.15); color: #10b981;">
+                                <i class="bi bi-book-half"></i>
+                            </div>
+                            <h5 class="modal-title fw-bold text-white mb-0" id="addBookModalLabel">Add New Book to Catalog</h5>
+                        </div>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <div class="modal-body p-4">
+                        <div class="row g-3">
+                            <div class="col-md-8">
+                                <label for="bookTitle" class="form-label small fw-semibold text-muted">Book Title <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control bg-dark text-white border-secondary border-opacity-50" id="bookTitle" name="titre" placeholder="E.g. Deep Learning Essentials" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="bookCategory" class="form-label small fw-semibold text-muted">Category <span class="text-danger">*</span></label>
+                                <select class="form-select bg-dark text-white border-secondary border-opacity-50" id="bookCategory" name="categorie">
+                                    {% for cat in categories_livres %}
+                                    <option value="{{ cat }}">{{ cat }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="bookAuthor" class="form-label small fw-semibold text-muted">Author / Faculty Lead <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control bg-dark text-white border-secondary border-opacity-50" id="bookAuthor" name="auteur" placeholder="E.g. Dr. Karim Bennani" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="bookIsbn" class="form-label small fw-semibold text-muted">ISBN Code</label>
+                                <input type="text" class="form-control bg-dark text-white border-secondary border-opacity-50 font-monospace" id="bookIsbn" name="isbn" placeholder="978-2-12345-678-9">
+                            </div>
+
+                            <div class="col-md-4">
+                                <label for="bookYear" class="form-label small fw-semibold text-muted">Publication Year</label>
+                                <input type="number" class="form-control bg-dark text-white border-secondary border-opacity-50" id="bookYear" name="annee_publication" value="2026" min="1950" max="2030">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="bookCopies" class="form-label small fw-semibold text-muted">Inventory Copies</label>
+                                <input type="number" class="form-control bg-dark text-white border-secondary border-opacity-50" id="bookCopies" name="nombre_exemplaires" value="3" min="1" max="100">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="bookRating" class="form-label small fw-semibold text-muted">Academic Rating (1-5)</label>
+                                <input type="number" step="0.1" class="form-control bg-dark text-white border-secondary border-opacity-50" id="bookRating" name="note" value="4.8" min="1" max="5">
+                            </div>
+
+                            <!-- Image File Upload -->
+                            <div class="col-12">
+                                <label for="bookImage" class="form-label small fw-semibold text-muted">
+                                    <i class="bi bi-image me-1 text-success"></i> Book Cover Image File (JPG / PNG / WEBP)
+                                </label>
+                                <input class="form-control bg-dark text-white border-secondary border-opacity-50" type="file" id="bookImage" name="image" accept="image/*">
+                                <div class="form-text text-muted small">Upload an image file from your computer. If omitted, a dynamic emerald gradient cover will be used.</div>
+                            </div>
+
+                            <div class="col-12">
+                                <label for="bookDesc" class="form-label small fw-semibold text-muted">Book Abstract / Summary</label>
+                                <textarea class="form-control bg-dark text-white border-secondary border-opacity-50" id="bookDesc" name="description" rows="3" placeholder="Summary of the book curriculum, key chapters, and recommended academic majors..."></textarea>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="form-check form-switch pt-2">
+                                    <input class="form-check-input" type="checkbox" id="bookDispo" name="disponible" checked>
+                                    <label class="form-check-label text-white small fw-semibold" for="bookDispo">
+                                        Mark as available for circulation immediately
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer modal-footer-admin">
+                        <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-theme-primary btn-sm px-4">
+                            <i class="bi bi-check-lg me-1"></i> Save to Catalog
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Add New Mini-Course -->
+    <div class="modal fade" id="addCourseModal" tabindex="-1" aria-labelledby="addCourseModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content modal-content-admin">
+                <form action="{% url 'pages:ajouter_cours_admin' %}" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="modal-header modal-header-admin">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="stat-icon-wrap" style="width: 36px; height: 36px; font-size: 1.1rem; background: rgba(20, 184, 166, 0.15); color: #14b8a6;">
+                                <i class="bi bi-mortarboard-fill"></i>
+                            </div>
+                            <h5 class="modal-title fw-bold text-white mb-0" id="addCourseModalLabel">Publish New Mini-Course</h5>
+                        </div>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <div class="modal-body p-4">
+                        <div class="row g-3">
+                            <div class="col-md-8">
+                                <label for="courseTitle" class="form-label small fw-semibold text-muted">Course Title <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control bg-dark text-white border-secondary border-opacity-50" id="courseTitle" name="titre" placeholder="E.g. Django 5 REST Framework Masterclass" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="courseCategory" class="form-label small fw-semibold text-muted">Category <span class="text-danger">*</span></label>
+                                <select class="form-select bg-dark text-white border-secondary border-opacity-50" id="courseCategory" name="categorie">
+                                    {% for cat in categories_cours %}
+                                    <option value="{{ cat }}">{{ cat }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="courseInstructor" class="form-label small fw-semibold text-muted">Instructor / Speaker <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control bg-dark text-white border-secondary border-opacity-50" id="courseInstructor" name="formateur" placeholder="E.g. Prof. Youssef El Amrani" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="courseLevel" class="form-label small fw-semibold text-muted">Target Level</label>
+                                <select class="form-select bg-dark text-white border-secondary border-opacity-50" id="courseLevel" name="niveau">
+                                    {% for niv in niveaux_cours %}
+                                    <option value="{{ niv }}">{{ niv }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="courseDuration" class="form-label small fw-semibold text-muted">Total Duration (Minutes)</label>
+                                <input type="number" class="form-control bg-dark text-white border-secondary border-opacity-50" id="courseDuration" name="duree_minutes" value="60" min="15" max="600">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="courseLessons" class="form-label small fw-semibold text-muted">Number of Video Lessons</label>
+                                <input type="number" class="form-control bg-dark text-white border-secondary border-opacity-50" id="courseLessons" name="nombre_lecons" value="6" min="1" max="50">
+                            </div>
+
+                            <!-- Course Thumbnail File Upload -->
+                            <div class="col-12">
+                                <label for="courseImage" class="form-label small fw-semibold text-muted">
+                                    <i class="bi bi-image me-1 text-info"></i> Course Thumbnail Image File (JPG / PNG / WEBP)
+                                </label>
+                                <input class="form-control bg-dark text-white border-secondary border-opacity-50" type="file" id="courseImage" name="image" accept="image/*">
+                                <div class="form-text text-muted small">Upload an image file from your computer for this e-learning capsule.</div>
+                            </div>
+
+                            <div class="col-12">
+                                <label for="courseDesc" class="form-label small fw-semibold text-muted">Course Curriculum Overview</label>
+                                <textarea class="form-control bg-dark text-white border-secondary border-opacity-50" id="courseDesc" name="description" rows="3" placeholder="Learning objectives, prerequisite knowledge, and syllabus breakdown..."></textarea>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="form-check form-switch pt-2">
+                                    <input class="form-check-input" type="checkbox" id="coursePopular" name="populaire">
+                                    <label class="form-check-label text-white small fw-semibold" for="coursePopular">
+                                        Mark as Featured / Popular Masterclass
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer modal-footer-admin">
+                        <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-theme-primary btn-sm px-4">
+                            <i class="bi bi-cloud-arrow-up-fill me-1"></i> Publish Course
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5.3.3 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- BiblioLearn Application & Theme Script -->
+    <script src="{% static 'js/bibliolearn.js' %}"></script>
+</body>
+</html>

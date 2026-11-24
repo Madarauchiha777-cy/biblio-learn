@@ -1,0 +1,269 @@
+{% extends "base.html" %}
+
+{% block title %}Architecture &amp; The 4 Modules &bull; BiblioLearn ESMA{% endblock %}
+
+{% block content %}
+<!-- Page Header Banner with Breadcrumb -->
+<section class="page-header-banner">
+    <div class="container text-center">
+        <!-- Bootstrap 5.3 Breadcrumb -->
+        <nav aria-label="breadcrumb" class="breadcrumb-theme d-flex justify-content-center mb-3">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{% url 'pages:accueil' %}"><i class="bi bi-house me-1"></i>Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Modules &amp; Architecture</li>
+            </ol>
+        </nav>
+
+        <span class="badge badge-subtle-violet px-3 py-1 mb-3">
+            <i class="bi bi-grid-3x3-gap me-1"></i> Functional Architecture &amp; Governance
+        </span>
+        <h1 class="display-5 fw-bold text-white mb-2">The 4 Core Pillars of BiblioLearn</h1>
+        <p class="text-muted mx-auto mb-0" style="max-width: 680px;">
+            An integrated university platform built to streamline library circulation, empower academic discovery, and drive self-paced learning across ESMA Marrakech.
+        </p>
+    </div>
+</section>
+
+<!-- The 4 Main Modules Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row g-4">
+            {% for mod in modules_detail %}
+            <div class="col-lg-6" id="{{ mod.id }}">
+                <div class="module-detail-card">
+                    <!-- Image Banner & Icon -->
+                    <div class="module-img-banner">
+                        <img src="{{ mod.image }}" alt="{{ mod.nom }}" loading="lazy">
+                        <div class="module-img-overlay">
+                            <div class="module-header-icon" style="background: {{ mod.couleur }};">
+                                <i class="bi {{ mod.icone }}"></i>
+                            </div>
+                            <span class="badge badge-subtle-emerald px-2 py-1 small">
+                                {{ mod.badge }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Module Content -->
+                    <div class="p-4 d-flex flex-column flex-grow-1">
+                        <h3 class="h4 fw-bold text-white mb-2">{{ mod.nom }}</h3>
+                        <p class="text-muted small mb-4" style="line-height: 1.6;">{{ mod.tagline }}</p>
+
+                        <h6 class="text-white-50 small text-uppercase fw-bold mb-3">Integrated Key Features:</h6>
+                        <div class="mb-4 flex-grow-1">
+                            {% for f in mod.fonctionnalites %}
+                            <div class="feature-item">
+                                <i class="bi bi-check-circle-fill"></i>
+                                <span>{{ f }}</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Card Footer -->
+                        <div class="pt-3 border-top border-secondary border-opacity-25 mt-auto d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3">
+                            <div>
+                                <span class="text-muted small">Eligible Audience:</span>
+                                <div class="small fw-semibold text-white">{{ mod.public_cible }}</div>
+                            </div>
+
+                            <a href="{{ mod.lien_action }}" class="btn btn-sm btn-theme-primary flex-shrink-0">
+                                {{ mod.texte_action }} <i class="bi bi-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Book Loan Circulation Lifecycle (Step-by-Step Workflow) -->
+<section class="py-5 bg-dark bg-opacity-50 border-top border-bottom border-secondary border-opacity-25" id="emprunts">
+    <div class="container py-2">
+        <div class="text-center mb-5">
+            <span class="badge badge-subtle-amber px-3 py-1 mb-2">
+                <i class="bi bi-arrow-repeat me-1"></i> Standard Operating Procedure
+            </span>
+            <h2 class="h1 fw-bold text-white">The Book Loan Circulation Lifecycle</h2>
+            <p class="text-muted mx-auto" style="max-width: 600px;">
+                A transparent 4-step process designed for students, faculty, and circulation desk staff at ESMA Marrakech.
+            </p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-3">
+                <div class="stat-box text-center p-4">
+                    <div class="stat-icon-wrap mx-auto mb-3" style="width: 52px; height: 52px; font-size: 1.5rem;">
+                        <span class="fw-bold">1</span>
+                    </div>
+                    <h5 class="fw-bold text-white mb-2">Search &amp; Discovery</h5>
+                    <p class="small text-muted mb-0">
+                        Browse the online catalog (/livres/) to identify your title, author, and aisle shelf location code.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="stat-box text-center p-4">
+                    <div class="stat-icon-wrap mx-auto mb-3" style="width: 52px; height: 52px; font-size: 1.5rem;">
+                        <span class="fw-bold">2</span>
+                    </div>
+                    <h5 class="fw-bold text-white mb-2">Stock Verification</h5>
+                    <p class="small text-muted mb-0">
+                        Check real-time stock levels and confirm that available copies are currently present in the library stacks.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="stat-box text-center p-4">
+                    <div class="stat-icon-wrap mx-auto mb-3" style="width: 52px; height: 52px; font-size: 1.5rem;">
+                        <span class="fw-bold">3</span>
+                    </div>
+                    <h5 class="fw-bold text-white mb-2">Desk Checkout</h5>
+                    <p class="small text-muted mb-0">
+                        Present your student ID card at the central desk to complete the physical book loan (standard 14-day period).
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="stat-box text-center p-4">
+                    <div class="stat-icon-wrap mx-auto mb-3" style="width: 52px; height: 52px; font-size: 1.5rem;">
+                        <span class="fw-bold">4</span>
+                    </div>
+                    <h5 class="fw-bold text-white mb-2">Renewal &amp; Return</h5>
+                    <p class="small text-muted mb-0">
+                        Renew your book loan once online before the due date, or return the book directly to the checkout desk.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Role-Based Access Control (RBAC) Permissions Matrix -->
+<section class="py-5" id="permissions">
+    <div class="container py-2">
+        <div class="text-center mb-5">
+            <span class="badge badge-subtle-emerald px-3 py-1 mb-2">
+                <i class="bi bi-shield-check me-1"></i> Security &amp; Access Controls
+            </span>
+            <h2 class="h1 fw-bold text-white">Role-Based Access Control (RBAC) Matrix</h2>
+            <p class="text-muted mx-auto" style="max-width: 650px;">
+                Granular distribution of user privileges and access authorizations across the BiblioLearn university platform.
+            </p>
+        </div>
+
+        <div class="card bg-dark bg-opacity-75 border-secondary border-opacity-25 shadow-lg rounded-4 overflow-hidden">
+            <div class="table-responsive">
+                <table class="table table-custom align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th scope="col" style="min-width: 200px;">User Profile</th>
+                            <th scope="col" class="text-center">Library Catalog</th>
+                            <th scope="col" class="text-center">Loan Quota &amp; Duration</th>
+                            <th scope="col" class="text-center">E-Learning Courses</th>
+                            <th scope="col" class="text-center">Administration Console</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="fw-semibold text-white">
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="stat-icon-wrap mb-0" style="width: 32px; height: 32px; font-size: 1rem;">
+                                        <i class="bi bi-person-fill text-success"></i>
+                                    </div>
+                                    <span>ESMA Student</span>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge badge-subtle-emerald">Browse &amp; Search</span>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge badge-subtle-teal">3 books &bull; 14 days</span>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge badge-subtle-emerald">Unlimited Access</span>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge bg-dark text-muted border border-secondary border-opacity-25">No Access</span>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td class="fw-semibold text-white">
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="stat-icon-wrap mb-0" style="width: 32px; height: 32px; font-size: 1rem;">
+                                        <i class="bi bi-mortarboard-fill text-info"></i>
+                                    </div>
+                                    <span>Faculty / Instructor</span>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge badge-subtle-emerald">Browse &amp; Course Requests</span>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge badge-subtle-teal">6 books &bull; 30 days</span>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge badge-subtle-emerald">Author &amp; Learn</span>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge badge-subtle-teal">Course Materials</span>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td class="fw-semibold text-white">
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="stat-icon-wrap mb-0" style="width: 32px; height: 32px; font-size: 1rem;">
+                                        <i class="bi bi-book-half text-warning"></i>
+                                    </div>
+                                    <span>Circulation Desk Librarian</span>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge badge-subtle-emerald">Manage &amp; Catalog</span>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge badge-subtle-emerald">Issue &amp; Return Validation</span>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge badge-subtle-emerald">Full Access</span>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge badge-subtle-amber">Stock Governance &bull; Django</span>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td class="fw-semibold text-white">
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="stat-icon-wrap mb-0" style="width: 32px; height: 32px; font-size: 1rem;">
+                                        <i class="bi bi-shield-lock-fill text-danger"></i>
+                                    </div>
+                                    <span>System Administrator</span>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge badge-subtle-emerald">Full Supervision</span>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge badge-subtle-emerald">Global Settings</span>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge badge-subtle-emerald">Moderation &amp; Publishing</span>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge badge-subtle-rose">Full Superuser Access</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
