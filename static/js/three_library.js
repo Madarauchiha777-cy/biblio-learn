@@ -58,32 +58,46 @@
             if (!this.isWebGLAvailable()) {
                 const fallback = document.getElementById('webgl-fallback');
                 if (fallback) fallback.classList.remove('d-none');
+                const loader = document.getElementById('scene-loader');
+                if (loader) loader.remove();
                 return;
             }
 
-            this.setupRenderer(container);
-            this.setupScene();
-            this.setupCamera(container);
-            this.setupLighting();
-            this.buildArchitecture();
-            this.setupBibiCharacter();
-            this.setupEventListeners(container);
-            this.setupAudio();
+            try {
+                this.setupRenderer(container);
+                this.setupScene();
+                this.setupCamera(container);
+                this.setupLighting();
+                this.buildArchitecture();
+                this.setupBibiCharacter();
+                this.setupEventListeners(container);
+                this.setupAudio();
 
-            // Load live Django catalog
-            this.fetchDjangoCatalog();
+                // Load live Django catalog
+                this.fetchDjangoCatalog();
 
-            // Start animation loop
-            this.animate();
+                // Start animation loop
+                this.animate();
 
-            // Hide loading overlay once scene is initialized
-            setTimeout(() => {
+                // Hide loading overlay once scene is initialized
+                setTimeout(() => {
+                    const loader = document.getElementById('scene-loader');
+                    if (loader) {
+                        loader.style.opacity = '0';
+                        setTimeout(() => loader.remove(), 600);
+                    }
+                }, 600);
+            } catch (err) {
+                console.error("3D Library Initialization Error:", err);
                 const loader = document.getElementById('scene-loader');
-                if (loader) {
-                    loader.style.opacity = '0';
-                    setTimeout(() => loader.remove(), 600);
+                if (loader) loader.remove();
+                const fallback = document.getElementById('webgl-fallback');
+                if (fallback) {
+                    fallback.classList.remove('d-none');
+                    const p = fallback.querySelector('p');
+                    if (p) p.textContent = "Initialization Notice: " + err.message;
                 }
-            }, 800);
+            }
         },
 
         isWebGLAvailable: function () {
@@ -101,7 +115,9 @@
                 powerPreference: "high-performance",
                 alpha: false
             });
-            this.renderer.setSize(container.clientWidth, container.clientHeight);
+            const width = container.clientWidth || window.innerWidth;
+            const height = container.clientHeight || (window.innerHeight - 70);
+            this.renderer.setSize(width, height);
             this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
             this.renderer.shadowMap.enabled = true;
             this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -118,17 +134,24 @@
         },
 
         setupCamera: function (container) {
-            this.camera = new THREE.PerspectiveCamera(50, container.clientWidth, container.clientHeight, 0.1, 120);
+            const width = container.clientWidth || window.innerWidth;
+            const height = container.clientHeight || (window.innerHeight - 70);
+            const aspect = width / Math.max(height, 1);
+            this.camera = new THREE.PerspectiveCamera(50, aspect, 0.1, 120);
             this.camera.position.copy(this.cameraPresets.overview.pos);
 
-            this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
-            this.controls.enableDamping = true;
-            this.controls.dampingFactor = 0.05;
-            this.controls.maxPolarAngle = Math.PI / 2 - 0.03; // Don't clip through floor
-            this.controls.minDistance = 2.0;
-            this.controls.maxDistance = 32.0;
-            this.controls.target.copy(this.cameraPresets.overview.target);
-            this.controls.update();
+            if (typeof THREE.OrbitControls === 'function') {
+                this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
+                this.controls.enableDamping = true;
+                this.controls.dampingFactor = 0.05;
+                this.controls.maxPolarAngle = Math.PI / 2 - 0.03; // Don't clip through floor
+                this.controls.minDistance = 2.0;
+                this.controls.maxDistance = 32.0;
+                this.controls.target.copy(this.cameraPresets.overview.target);
+                this.controls.update();
+            } else {
+                console.warn("OrbitControls not available; camera operating in static mode");
+            }
         },
 
         setupLighting: function () {
@@ -831,16 +854,23 @@
 
             // 4. Front Cover Art Texture (if available)
             if (bookData.cover_url) {
-                const textureLoader = new THREE.TextureLoader();
-                textureLoader.crossOrigin = "anonymous";
-                textureLoader.load(bookData.cover_url, (tex) => {
-                    tex.encoding = THREE.sRGBEncoding;
-                    const coverArtMat = new THREE.MeshStandardMaterial({ map: tex, roughness: 0.4 });
-                    const coverArtMesh = new THREE.Mesh(new THREE.PlaneGeometry(depth, height), coverArtMat);
-                    coverArtMesh.rotation.y = Math.PI / 2;
-                    coverArtMesh.position.set(width / 2 + 0.002, 0, 0);
-                    group.add(coverArtMesh);
-                });
+                try {
+                    const textureLoader = new THREE.TextureLoader();
+                    textureLoader.crossOrigin = "anonymous";
+                    textureLoader.load(
+                        bookData.cover_url, 
+                        (tex) => {
+                            tex.encoding = THREE.sRGBEncoding;
+                            const coverArtMat = new THREE.MeshStandardMaterial({ map: tex, roughness: 0.4 });
+                            const coverArtMesh = new THREE.Mesh(new THREE.PlaneGeometry(depth, height), coverArtMat);
+                            coverArtMesh.rotation.y = Math.PI / 2;
+                            coverArtMesh.position.set(width / 2 + 0.002, 0, 0);
+                            group.add(coverArtMesh);
+                        },
+                        undefined,
+                        () => { /* Silent fallback on external image CORS failure */ }
+                    );
+                } catch (e) {}
             }
 
             // Outline highlight mesh (initially invisible)
@@ -937,9 +967,11 @@
         setupEventListeners: function (container) {
             // Window resize
             window.addEventListener('resize', () => {
-                this.camera.aspect = container.clientWidth / container.clientHeight;
+                const w = container.clientWidth || window.innerWidth;
+                const h = container.clientHeight || (window.innerHeight - 70);
+                this.camera.aspect = w / Math.max(h, 1);
                 this.camera.updateProjectionMatrix();
-                this.renderer.setSize(container.clientWidth, container.clientHeight);
+                this.renderer.setSize(w, h);
             });
 
             // Mouse move for Gaze Tracking & Raycasting
